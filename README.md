@@ -1,16 +1,84 @@
-# React + Vite
+SPOTIBAI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+my first ever solo project
 
-Currently, two official plugins are available:
+A spotify like app/web that features filipino/english memes that are mostly songs or jingles
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+FEATURES:
 
-## React Compiler
+music player
+play, pause, skip
+volume control
+mobile friendly
+desktop friendly
+save liked songs
+comment on songs
+online acces
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+I used
 
-## Expanding the ESLint configuration
+React
+Vite
+JavaScript
+HTML
+CSS
+Git
+Github
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+STATUS
+
+Completed
+
+Create React + Vite project
+
+Set up Git
+
+Create GitHub repository
+
+Push initial project to GitHub
+
+In Progress
+
+Design Spotibai interface
+
+Add custom music
+
+Build music player
+
+Add Build-a-Player feature
+
+Add saved players
+
+Make the application responsive
+
+Deploy Spotibai online
+
+Running the Project
+
+Clone the repository:
+
+git clone https://github.com/Leopoldooo/Spotibai.git
+
+Enter the project folder:
+
+cd Spotibai
+
+Install dependencies:
+
+npm install
+
+Start the development server:
+
+npm run dev
+
+Then open the local address shown in the terminal.
+
+Future Plans
+Improve the music player
+Add more custom songs
+Improve the player-building system
+Add player customization
+Add saved player management
+Improve mobile support
+Deploy the application
+Continue improving the UI and user experience
