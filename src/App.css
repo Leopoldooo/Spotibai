@@ -699,3 +699,233 @@ display: none;
 .player-like.liked {
   color: white;
 }
+
+.page-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 25px;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.playlist-card {
+  position: relative;
+  padding: 16px;
+  border-radius: 8px;
+  background: #181818;
+  cursor: pointer;
+}
+
+.playlist-card:hover {
+  background: #242424;
+}
+
+.playlist-cover {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  background: #333;
+  font-size: 65px;
+}
+
+.playlist-card h3 {
+  margin: 0 0 7px;
+}
+
+.playlist-card p {
+  margin: 0;
+  color: #999;
+  font-size: 13px;
+}
+
+.delete-playlist {
+  margin-top: 15px;
+  border: 0;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.delete-playlist:hover {
+  color: white;
+}
+
+.playlist-select {
+  width: 100%;
+  margin-top: 15px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 5px;
+  background: #111;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.back-button {
+  margin-bottom: 30px;
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.back-button:hover {
+  color: white;
+}
+
+.remove-track {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.remove-track:hover {
+  color: white;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.modal {
+  position: relative;
+  width: min(420px, 100%);
+  padding: 30px;
+  border-radius: 10px;
+  background: #282828;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal h2 {
+  margin: 0 0 8px;
+}
+
+.modal p {
+  margin: 0 0 20px;
+  color: #999;
+}
+
+.modal input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #555;
+  border-radius: 5px;
+  outline: none;
+  background: #181818;
+  color: white;
+}
+
+.modal input:focus {
+  border-color: white;
+}
+
+.modal-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.modal-close:hover {
+  color: white;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.secondary-button {
+  padding: 13px 20px;
+  border: 1px solid #555;
+  border-radius: 24px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.secondary-button:hover {
+  background: #333;
+}
+
+@media (max-width: 900px) {
+  .playlist-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 650px) {
+  .page-section {
+    padding: 30px 18px 120px;
+  }
+
+  .playlist-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .playlist-card {
+    padding: 10px;
+  }
+
+  .liked-heading {
+    align-items: center;
+    gap: 15px;
+  }
+
+  .liked-cover {
+    width: 120px;
+    height: 120px;
+    font-size: 50px;
+  }
+
+  .liked-heading h1 {
+    font-size: 35px;
+  }
+
+  .track-row {
+    grid-template-columns: 25px 45px 1fr auto;
+    gap: 10px;
+  }
+
+  .track-row-cover {
+    width: 45px;
+    height: 45px;
+  }
+
+  .track-row .track-duration,
+  .track-row .remove-track {
+    display: none;
+  }
+}
