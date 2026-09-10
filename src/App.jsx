@@ -56,6 +56,7 @@ function App() {
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const playTrack = (track) => {
     setCurrentTrack(track);
@@ -155,6 +156,20 @@ function App() {
     likedTracks.includes(track.id)
   );
 
+  const searchResults = tracks.filter((track) => {
+  const query = searchQuery.trim().toLowerCase();
+
+  if (!query) {
+    return true;
+  }
+
+  return (
+    track.title.toLowerCase().includes(query) ||
+    track.creator.toLowerCase().includes(query) ||
+    track.description.toLowerCase().includes(query)
+  );
+});
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -172,11 +187,16 @@ function App() {
             Home
           </button>
 
-          <button className="nav-item">
-            <span>🔍</span>
-            Search
-          </button>
-
+          <button
+  className={`nav-item ${currentPage === "search" ? "active" : ""}`}
+  onClick={() => {
+    setCurrentPage("search");
+    setSelectedPlaylist(null);
+  }}
+>
+  <span>🔍</span>
+  Search
+</button>
           <button className="nav-item">
             <span>▣</span>
             Your Library
@@ -267,6 +287,81 @@ function App() {
               </div>
             </section>
           </>
+        )}
+
+                {currentPage === "search" && (
+          <section className="page-section">
+            <div className="page-heading">
+              <p className="eyebrow">DISCOVER</p>
+
+              <h1>Search</h1>
+              <p>Find tracks on Spotibai.</p>
+            </div>
+
+            <div className="search-container">
+              <span className="search-icon">🔍</span>
+
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search for a track..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                autoFocus
+              />
+
+              {searchQuery && (
+                <button
+                  className="clear-search"
+                  onClick={() => setSearchQuery("")}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <section className="music-section search-results-section">
+              <div className="section-header">
+                <h2>
+                  {searchQuery.trim()
+                    ? `Results for "${searchQuery}"`
+                    : "All tracks"}
+                </h2>
+
+                <span className="search-result-count">
+                  {searchResults.length}{" "}
+                  {searchResults.length === 1 ? "track" : "tracks"}
+                </span>
+              </div>
+
+              {searchResults.length === 0 ? (
+                <div className="empty-playlist">
+                  <div className="empty-icon">🔍</div>
+
+                  <h2>No tracks found</h2>
+
+                  <p>
+                    Try searching for a different track, creator, or
+                    description.
+                  </p>
+                </div>
+              ) : (
+                <div className="music-grid">
+                  {searchResults.map((track) => (
+                    <TrackCard
+                      key={track.id}
+                      track={track}
+                      isLiked={likedTracks.includes(track.id)}
+                      onPlay={() => playTrack(track)}
+                      onLike={() => toggleLike(track.id)}
+                      playlists={playlists}
+                      onAddToPlaylist={addTrackToPlaylist}
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          </section>
         )}
 
         {currentPage === "playlist" && !selectedPlaylist && (

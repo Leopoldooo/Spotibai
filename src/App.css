@@ -929,3 +929,84 @@ display: none;
     display: none;
   }
 }
+
+/* Search */
+
+.search-container {
+  width: 100%;
+  max-width: 700px;
+  height: 52px;
+  margin: 30px 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  box-sizing: border-box;
+  background: #242424;
+  border: 1px solid transparent;
+  border-radius: 30px;
+}
+
+.search-container:focus-within {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.search-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: #a7a7a7;
+}
+
+.clear-search {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: #555;
+  color: white;
+  font-size: 20px;
+  line-height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.clear-search:hover {
+  background: #777;
+}
+
+.search-results-section {
+  margin-top: 10px;
+}
+
+.search-result-count {
+  color: #a7a7a7;
+  font-size: 14px;
+}
+
+@media (max-width: 700px) {
+  .search-container {
+    margin: 20px 0 30px;
+  }
+
+  .search-input {
+    font-size: 14px;
+  }
+
+  .search-result-count {
+    display: none;
+  }
+}
