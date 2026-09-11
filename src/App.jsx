@@ -1,38 +1,69 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const tracks = [
-  {
-    id: 1,
-    title: "Lucky Rap",
-    creator: "Spotibai",
-    description: "A Spotibai original",
-    duration: "0:42",
-    emoji: "🎵",
-  },
-  {
+{
+  id: 1,
+  title: "Lucky Rap",
+  creator: "Spotibai",
+  description: "MABANGIS",
+  duration: "0:42",
+  emoji: "🎵",
+  media: "/media/lucky-rap.mp4",
+  lyrics: [
+    "Lucky Rap",
+    "",
+    "Subok lang tayo yah, hindi toh pull ah ",
+    "Line 2 of the lyrics",
+    "Line 3 of the lyrics"
+  ]
+},  {
     id: 2,
-    title: "Funny Dialogue",
-    creator: "Spotibai",
-    description: "A funny audio clip",
+    title: "Hinarot",
+    creator: "EYY",
+    description: "Sa mga hinarot jan",
     duration: "0:28",
     emoji: "😂",
+    media: "/media/hinarot-pusong-malambot.mp4",
+  lyrics: [
+    "Hinarot",
+    "",
+    "Subok lang tayo yah, hindi toh pull ah ",
+    "Line 2 of the lyrics",
+    "Line 3 of the lyrics"
+  ]
   },
   {
     id: 3,
-    title: "Singing Meme",
-    creator: "Spotibai",
-    description: "A singing meme",
+    title: "Chocolate",
+    creator: "The 1975 - Jake Cuenca, Joseph Marco, and Enrique Gil ",
+    description: "We got the 1975 at home",
     duration: "0:35",
     emoji: "🎤",
+    media: "/media/1975-jake-cuenca.mp4",
+  lyrics: [
+    "Chocolate",
+    "",
+    "Subok lang tayo yah, hindi toh pull ah ",
+    "Line 2 of the lyrics",
+    "Line 3 of the lyrics"
+  ]
   },
   {
     id: 4,
-    title: "Random Audio",
-    creator: "Spotibai",
-    description: "Something random",
+    title: "Wait A Minute",
+    creator: "Bai",
+    description: "best song ni bai",
     duration: "0:51",
     emoji: "🔊",
+    media: "/media/wait-a-minute.mp4",
+  lyrics: [
+    "Wait A Minute",
+    "",
+    "Subok lang tayo yah, hindi toh pull ah ",
+    "Line 2 of the lyrics",
+    "Line 3 of the lyrics"
+  ]
   },
 ];
 
@@ -40,16 +71,20 @@ function App() {
   const [currentPage, setCurrentPage] = useState("home");
   const [currentTrack, setCurrentTrack] = useState(tracks[0]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playQueue, setPlayQueue] = useState(tracks);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+
+  const audioRef = useRef(null);
 
   const [likedTracks, setLikedTracks] = useState(() => {
-    const saved = localStorage.getItem("spotibai-liked");
-
+  const saved = localStorage.getItem("spotibai-liked");
     return saved ? JSON.parse(saved) : [];
   });
 
   const [playlists, setPlaylists] = useState(() => {
-    const saved = localStorage.getItem("spotibai-playlists");
-
+  const saved = localStorage.getItem("spotibai-playlists");
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -57,10 +92,126 @@ function App() {
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showLyrics, setShowLyrics] = useState(false);
 
-  const playTrack = (track) => {
-    setCurrentTrack(track);
+  const playTrack = (track, queue = tracks) => {
+  setPlayQueue(queue);
+
+  if (currentTrack.id === track.id && audioRef.current) {
+    audioRef.current.currentTime = 0;
+    setCurrentTime(0);
+
+    if (track.media) {
+      audioRef.current.play().catch(() => {
+        setIsPlaying(false);
+      });
+
+      setIsPlaying(true);
+    }
+
+    return;
+  }
+
+  setCurrentTrack(track);
+  setCurrentTime(0);
+  setDuration(0);
+
+  if (track.media) {
     setIsPlaying(true);
+  } else {
+    setIsPlaying(false);
+  }
+};
+
+  useEffect(() => {
+  if (!audioRef.current) {
+    return;
+  }
+
+  const video = audioRef.current;
+
+  if (isPlaying && currentTrack.media) {
+    if (video.ended) {
+      video.currentTime = 0;
+    }
+
+    video.play().catch(() => {
+      setIsPlaying(false);
+    });
+  } else {
+    video.pause();
+  }
+}, [isPlaying, currentTrack]);
+
+useEffect(() => {
+  if (!audioRef.current) {
+    return;
+  }
+
+  audioRef.current.volume = volume;
+}, [volume]);
+
+useEffect(() => {
+  const handleKeyDown = (event) => {
+    if (event.code !== "Space") {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+
+    if (
+      activeElement &&
+      (activeElement.tagName === "INPUT" ||
+        activeElement.tagName === "TEXTAREA" ||
+        activeElement.tagName === "BUTTON")
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (!audioRef.current || !currentTrack.media) {
+      return;
+    }
+
+    const video = audioRef.current;
+
+    if (video.paused || video.ended) {
+      if (video.ended) {
+        video.currentTime = 0;
+        setCurrentTime(0);
+      }
+
+      video.play().then(() => {
+        setIsPlaying(true);
+      }).catch(() => {
+        setIsPlaying(false);
+      });
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [currentTrack]);
+
+  const handleProgressClick = (event) => {
+    if (!audioRef.current || !duration) {
+      return;
+    }
+
+    const progressBar = event.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+
+    const clickPosition = event.clientX - rect.left;
+    const percentage = clickPosition / rect.width;
+
+    audioRef.current.currentTime = percentage * duration;
   };
 
   const toggleLike = (trackId) => {
@@ -157,18 +308,29 @@ function App() {
   );
 
   const searchResults = tracks.filter((track) => {
-  const query = searchQuery.trim().toLowerCase();
+    const query = searchQuery.trim().toLowerCase();
 
-  if (!query) {
-    return true;
-  }
+    if (!query) {
+      return true;
+    }
 
-  return (
-    track.title.toLowerCase().includes(query) ||
-    track.creator.toLowerCase().includes(query) ||
-    track.description.toLowerCase().includes(query)
-  );
-});
+    return (
+      track.title.toLowerCase().includes(query) ||
+      track.creator.toLowerCase().includes(query) ||
+      track.description.toLowerCase().includes(query)
+    );
+  });
+
+  const formatTime = (time) => {
+    if (!time || isNaN(time)) {
+      return "0:00";
+    }
+
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   return (
     <div className="app">
@@ -188,15 +350,16 @@ function App() {
           </button>
 
           <button
-  className={`nav-item ${currentPage === "search" ? "active" : ""}`}
-  onClick={() => {
-    setCurrentPage("search");
-    setSelectedPlaylist(null);
-  }}
->
-  <span>🔍</span>
-  Search
-</button>
+            className={`nav-item ${currentPage === "search" ? "active" : ""}`}
+            onClick={() => {
+              setCurrentPage("search");
+              setSelectedPlaylist(null);
+            }}
+          >
+            <span>🔍</span>
+            Search
+          </button>
+
           <button className="nav-item">
             <span>▣</span>
             Your Library
@@ -289,12 +452,13 @@ function App() {
           </>
         )}
 
-                {currentPage === "search" && (
+        {currentPage === "search" && (
           <section className="page-section">
             <div className="page-heading">
               <p className="eyebrow">DISCOVER</p>
 
               <h1>Search</h1>
+
               <p>Find tracks on Spotibai.</p>
             </div>
 
@@ -438,11 +602,16 @@ function App() {
           <PlaylistPage
             playlist={selectedPlaylist}
             tracks={tracks}
-            playlists={playlists}
             onBack={() => setSelectedPlaylist(null)}
-            onPlay={playTrack}
-            onRemove={removeTrackFromPlaylist}
-          />
+            onPlay={(track) => {
+            const playlistTracks = tracks.filter((item) =>
+            selectedPlaylist.tracks.includes(item.id)
+         );
+
+    playTrack(track, playlistTracks);
+  }}
+  onRemove={removeTrackFromPlaylist}
+/>
         )}
 
         {currentPage === "liked" && (
@@ -481,7 +650,7 @@ function App() {
                     index={index}
                     isLiked={true}
                     onLike={() => toggleLike(track.id)}
-                    onPlay={() => playTrack(track)}
+                    onPlay={() => playTrack(track, likedTrackList)}
                   />
                 ))}
               </div>
@@ -533,6 +702,70 @@ function App() {
         </div>
       )}
 
+      <video
+        ref={audioRef}
+        src={currentTrack.media || ""}
+        onTimeUpdate={() => {
+          if (audioRef.current) {
+            setCurrentTime(audioRef.current.currentTime);
+          }
+        }}
+        onLoadedMetadata={() => {
+          if (audioRef.current) {
+            setDuration(audioRef.current.duration);
+          }
+        }}
+        onEnded={() => {
+  const currentIndex = playQueue.findIndex(
+    (track) => track.id === currentTrack.id
+  );
+
+  const nextIndex =
+    currentIndex < playQueue.length - 1 ? currentIndex + 1 : 0;
+
+  const nextTrack = playQueue[nextIndex];
+
+  setCurrentTrack(nextTrack);
+  setCurrentTime(0);
+  setDuration(0);
+
+  if (nextTrack.media) {
+    setIsPlaying(true);
+  } else {
+    setIsPlaying(false);
+  }
+}}
+        style={{ display: "none" }}
+      />
+
+{showLyrics && (
+  <div className="lyrics-panel">
+    <div className="lyrics-header">
+      <div>
+        <p className="eyebrow">LYRICS</p>
+        <h2>{currentTrack.title}</h2>
+      </div>
+
+      <button
+        className="lyrics-close"
+        onClick={() => setShowLyrics(false)}
+      >
+        ×
+      </button>
+    </div>
+
+    <div className="lyrics-content">
+      {currentTrack.lyrics ? (
+        currentTrack.lyrics.map((line, index) => (
+          <p key={index}>{line || "\u00A0"}</p>
+        ))
+      ) : (
+        <p>No lyrics available.</p>
+      )}
+    </div>
+  </div>
+)}
+
       <div className="player">
         <div className="now-playing">
           <div className="mini-cover">{currentTrack.emoji}</div>
@@ -554,36 +787,94 @@ function App() {
 
         <div className="player-controls">
           <div className="control-buttons">
-            <button>↶</button>
-
             <button
-              className="play-button"
-              onClick={() => setIsPlaying(!isPlaying)}
-            >
-              {isPlaying ? "❚❚" : "▶"}
-            </button>
+  onClick={() => {
+    const currentIndex = playQueue.findIndex(
+      (track) => track.id === currentTrack.id
+    );
 
-            <button>↷</button>
+    const previousIndex =
+      currentIndex > 0 ? currentIndex - 1 : playQueue.length - 1;
+
+    playTrack(playQueue[previousIndex], playQueue);
+  }}
+>
+  ⏮
+</button>
+
+<button
+  className="play-button"
+  onClick={() => {
+    if (!currentTrack.media) {
+      return;
+    }
+
+    setIsPlaying(!isPlaying);
+  }}
+>
+  {isPlaying ? "❚❚" : "▶"}
+</button>
+
+<button
+  onClick={() => {
+    const currentIndex = playQueue.findIndex(
+      (track) => track.id === currentTrack.id
+    );
+
+    const nextIndex =
+      currentIndex < playQueue.length - 1 ? currentIndex + 1 : 0;
+
+    playTrack(playQueue[nextIndex], playQueue);
+  }}
+>
+  ⏭
+</button>
           </div>
 
           <div className="progress-container">
-            <span>0:00</span>
+            <span>{formatTime(currentTime)}</span>
 
-            <div className="progress-bar">
-              <div className="progress"></div>
+            <div
+              className="progress-bar"
+              onClick={handleProgressClick}
+            >
+              <div
+                className="progress"
+                style={{
+                  width: duration
+                    ? `${Math.min((currentTime / duration) * 100, 100)}%`
+                    : "0%",
+                }}
+              ></div>
             </div>
 
-            <span>{currentTrack.duration}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
 
         <div className="volume">
-          <span>🔊</span>
+  <button
+    className="lyrics-button"
+    onClick={() => setShowLyrics(!showLyrics)}
+  >
+    Lyrics
+  </button>
 
-          <div className="volume-bar">
-            <div className="volume-level"></div>
-          </div>
-        </div>
+  <span>🔊</span>
+
+<input
+  type="range"
+  min="0"
+  max="1"
+  step="0.01"
+  value={volume}
+  onChange={(event) => setVolume(Number(event.target.value))}
+  style={{
+    "--volume": volume,
+  }}
+  className="volume-slider"
+/>
+</div>
       </div>
     </div>
   );
@@ -631,6 +922,7 @@ function TrackCard({
                 Number(event.target.value),
                 track.id
               );
+
               event.target.value = "";
             }
           }}
