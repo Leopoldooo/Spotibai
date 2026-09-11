@@ -18,25 +18,41 @@ font: inherit;
   top: 16px;
   bottom: 105px;
   width: 335px;
-  padding: 20px 16px;
+  padding: 24px 12px;
   background: #121212;
   border-radius: 16px;
   overflow-y: auto;
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   padding: 0 12px;
   margin-bottom: 28px;
-  font-size: 24px;
+}
+
+.logo img {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.logo-text {
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: -1px;
+  color: white;
 }
 
 .sidebar nav,
 .sidebar-section {
-display: flex;
-flex-direction: column;
-gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 30px;
 }
 
 .sidebar-section {
@@ -44,41 +60,45 @@ margin-top: 32px;
 }
 
 .section-title {
-padding: 0 12px;
-margin: 0 0 8px;
-color: #8d8d8d;
-font-size: 12px;
-font-weight: 700;
-text-transform: uppercase;
-letter-spacing: 1px;
+  padding: 0 16px;
+  margin: 0 0 10px;
+  color: #b3b3b3;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
   width: 100%;
-  padding: 11px 12px;
+  padding: 13px 16px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: transparent;
-  color: #a7a7a7;
+  color: #b3b3b3;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 15px;
   text-align: left;
-  transition: 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.nav-item:hover,
+.nav-item:hover {
+  color: white;
+}
+
 .nav-item.active {
   background: #2a2a2a;
   color: white;
 }
 
 .nav-item span {
-width: 20px;
-text-align: center;
-font-size: 18px;
+  width: 22px;
+  text-align: center;
+  font-size: 20px;
 }
 
 .main-content {
@@ -127,8 +147,9 @@ font-size: 22px;
 .profile-button {
 display: flex;
 align-items: center;
-gap: 8px;
-padding: 6px 12px 6px 6px;
+gap: 10px;
+padding: 8px 14px 8px 12px;
+font-size: 20px;
 border: 0;
 border-radius: 20px;
 background: #080808;
@@ -137,10 +158,17 @@ cursor: pointer;
 font-weight: 600;
 }
 
+.profile-name {
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .profile-icon {
 display: grid;
-width: 28px;
-height: 28px;
+width: 50px;
+height: 50px;
 place-items: center;
 border-radius: 50%;
 background: #535353;
@@ -153,11 +181,11 @@ background: #535353;
 }
 
 .eyebrow {
-margin: 0 0 8px;
-color: #b8b8b8;
-font-size: 13px;
-font-weight: 700;
-letter-spacing: 2px;
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.986);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
 }
 
 .hero h1 {
@@ -1301,4 +1329,344 @@ display: none;
 
 .comment-input-container button:hover {
   transform: scale(1.03);
+}
+
+.profile-panel {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 30;
+  width: 320px;
+  padding: 24px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background: #181818;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.profile-header p {
+  margin: 0;
+}
+
+.profile-header h2 {
+  margin: 4px 0 0;
+}
+
+.profile-close {
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.profile-close:hover {
+  color: white;
+}
+
+.profile-avatar-large {
+  display: grid;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 50%;
+  background: #333;
+  font-size: 36px;
+}
+
+
+.profile-panel label {
+  display: block;
+  margin-bottom: 8px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.profile-panel input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  outline: none;
+  background: #242424;
+  color: white;
+}
+
+.profile-panel input:focus {
+  border-color: #777;
+}
+
+.profile-save {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  border: 0;
+  border-radius: 20px;
+  background: white;
+  color: black;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.profile-save:hover {
+  transform: scale(1.02);
+}
+
+.profile-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-picture-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.cropper-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.cropper-modal {
+  width: 420px;
+  max-width: 100%;
+  padding: 24px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background: #181818;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.cropper-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.cropper-header p {
+  margin: 0;
+}
+
+.cropper-header h2 {
+  margin: 4px 0 0;
+}
+
+.cropper-close {
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.cropper-close:hover {
+  color: white;
+}
+
+.crop-area {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #000;
+  cursor: grab;
+  touch-action: none;
+}
+
+.crop-area.dragging {
+  cursor: grabbing;
+}
+
+.crop-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  width: auto;
+  height: auto;
+  transform-origin: center center;
+  user-select: none;
+  pointer-events: none;
+}
+
+
+
+.crop-circle {
+  position: absolute;
+  inset: 0;
+  border: 3px solid white;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.crop-controls {
+  margin-top: 24px;
+}
+
+.crop-controls label {
+  display: block;
+  margin-bottom: 8px;
+  color: #aaa;
+  font-size: 13px;
+}
+
+.crop-controls input {
+  width: 100%;
+}
+
+.cropper-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.profile-icon {
+  display: grid;
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 50%;
+  background: #333;
+  flex-shrink: 0;
+}
+
+.profile-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.comment-avatar {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 50%;
+  background: #333;
+  font-size: 18px;
+}
+
+.comment-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.featured-artist {
+  padding: 40px 40px 25px;
+}
+
+.featured-artist-content {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 28px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    #3b315d 0%,
+    #242424 60%,
+    #181818 100%
+  );
+}
+
+.featured-artist-image {
+  display: grid;
+  width: 170px;
+  height: 170px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  background: #555;
+  font-size: 65px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.featured-artist-info {
+  min-width: 0;
+}
+
+.featured-label {
+  margin: 0 0 8px;
+  color: #b3b3b3;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.featured-artist-info h1 {
+  margin: 0;
+  font-size: clamp(42px, 5vw, 64px);
+  letter-spacing: -2px;
+}
+
+.featured-artist-info p:not(.featured-label) {
+  max-width: 500px;
+  margin: 12px 0 22px;
+  color: #c4c4c4;
+  line-height: 1.5;
+}
+
+.home-track-list {
+  margin-top: 4px;
+}
+
+.home-track-list .track-row {
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.home-track-list .track-row:hover {
+  background: #2a2a2a;
+}
+
+.popular-songs-title {
+  margin: 0;
+  color: white;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.popular-songs-section {
+  padding-top: 1px;
+}
+
+.recently-added-title {
+  margin: 0;
+  color: white;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.recently-added-section {
+  padding-top: 5px;
 }

@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
+const featuredArtist = {
+  name: "Spotibai",
+  description:
+    "The home of funny, memorable, and unexpected music from the Spotibai community.",
+  image: "🎵",
+};
+
 const tracks = [
 {
   id: 1,
@@ -107,6 +114,28 @@ function App() {
 
   const [showProfile, setShowProfile] = useState(false);
   const [profileName, setProfileName] = useState(profile.name);
+  const [profileAvatar, setProfileAvatar] = useState(profile.avatar);
+  const [showCropper, setShowCropper] = useState(false);
+  const [cropImage, setCropImage] = useState(null);
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropPosition, setCropPosition] = useState({
+  x: 0,
+  y: 0,
+});
+
+const [cropImageDimensions, setCropImageDimensions] = useState({
+  width: 0,
+  height: 0,
+});
+
+const [isDragging, setIsDragging] = useState(false);
+
+const [dragStart, setDragStart] = useState({
+  x: 0,
+  y: 0,
+  startX: 0,
+  startY: 0,
+});
   const [comments, setComments] = useState(() => {
   const saved = localStorage.getItem("spotibai-comments");
   return saved ? JSON.parse(saved) : {};
@@ -242,10 +271,11 @@ const addComment = () => {
   }
 
   const newComment = {
-    id: Date.now(),
-    text,
-    author: profile.name,
-  };
+  id: Date.now(),
+  text,
+  author: profile.name,
+  avatar: profile.avatar,
+};
 
   const updatedComments = {
     ...comments,
@@ -276,6 +306,171 @@ const addComment = () => {
     });
   };
 
+  const handleProfilePictureChange = (event) => {
+  const file = event.target.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    setCropImage(reader.result);
+
+    setCropZoom(1);
+
+    setCropPosition({
+      x: 0,
+      y: 0,
+    });
+
+    setCropImageDimensions({
+      width: 0,
+      height: 0,
+    });
+
+    setShowCropper(true);
+  };
+
+  reader.readAsDataURL(file);
+};
+
+const handleCropPointerDown = (event) => {
+  event.currentTarget.setPointerCapture(event.pointerId);
+
+  setIsDragging(true);
+
+  setDragStart({
+    x: event.clientX,
+    y: event.clientY,
+    startX: cropPosition.x,
+    startY: cropPosition.y,
+  });
+};
+
+const handleCropPointerMove = (event) => {
+  if (!isDragging || !cropImageDimensions.width) {
+    return;
+  }
+
+  const moveX = event.clientX - dragStart.x;
+  const moveY = event.clientY - dragStart.y;
+
+  const cropSize = 300;
+
+  const baseScale = Math.max(
+    cropSize / cropImageDimensions.width,
+    cropSize / cropImageDimensions.height
+  );
+
+  const scale = baseScale * cropZoom;
+
+  const imageWidth = cropImageDimensions.width * scale;
+  const imageHeight = cropImageDimensions.height * scale;
+
+  const maxX = Math.max(0, (imageWidth - cropSize) / 2);
+  const maxY = Math.max(0, (imageHeight - cropSize) / 2);
+
+  const newX = Math.max(
+    -maxX,
+    Math.min(maxX, dragStart.startX + moveX)
+  );
+
+  const newY = Math.max(
+    -maxY,
+    Math.min(maxY, dragStart.startY + moveY)
+  );
+
+  setCropPosition({
+    x: newX,
+    y: newY,
+  });
+};
+
+const handleCropPointerUp = (event) => {
+  setIsDragging(false);
+
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  }
+};
+
+const createCroppedImage = () => {
+  if (!cropImage || !cropImageDimensions.width) {
+    return;
+  }
+
+  const image = new Image();
+
+  image.onload = () => {
+    const cropSize = 512;
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = cropSize;
+    canvas.height = cropSize;
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return;
+    }
+
+    const baseScale = Math.max(
+      cropSize / image.naturalWidth,
+      cropSize / image.naturalHeight
+    );
+
+    const scale = baseScale * cropZoom;
+
+    const imageWidth = image.naturalWidth * scale;
+    const imageHeight = image.naturalHeight * scale;
+
+    const drawX =
+      cropSize / 2 -
+      imageWidth / 2 +
+      cropPosition.x * (cropSize / 300);
+
+    const drawY =
+      cropSize / 2 -
+      imageHeight / 2 +
+      cropPosition.y * (cropSize / 300);
+
+    context.clearRect(0, 0, cropSize, cropSize);
+
+    context.beginPath();
+    context.arc(
+      cropSize / 2,
+      cropSize / 2,
+      cropSize / 2,
+      0,
+      Math.PI * 2
+    );
+    context.closePath();
+    context.clip();
+
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+
+    context.drawImage(
+      image,
+      drawX,
+      drawY,
+      imageWidth,
+      imageHeight
+    );
+
+    const croppedImage = canvas.toDataURL("image/png");
+
+    setProfileAvatar(croppedImage);
+    setShowCropper(false);
+    setCropImage(null);
+  };
+
+  image.src = cropImage;
+};
+
   const saveProfile = () => {
   const name = profileName.trim();
 
@@ -286,6 +481,7 @@ const addComment = () => {
   const updatedProfile = {
     ...profile,
     name,
+    avatar: profileAvatar,
   };
 
   setProfile(updatedProfile);
@@ -406,7 +602,10 @@ const addComment = () => {
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="logo">spotibai</div>
+        <div className="logo">
+  <img src="/media/spotibai-logo.png" alt="Spotibai" />
+  <span className="logo-text">Spotibai</span>
+</div>
 
         <nav>
           <button
@@ -475,34 +674,59 @@ const addComment = () => {
             <button>›</button>
           </div>
 
-          <button className="profile-button">
-            <span className="profile-icon">P</span>
-            Phol
-          </button>
+          <button
+  className="profile-button"
+  onClick={() => {
+    setProfileName(profile.name);
+    setShowProfile(!showProfile);
+  }}
+>
+  <span className="profile-icon">
+  {profile.avatar?.startsWith("data:image") ? (
+    <img
+      src={profile.avatar}
+      alt="Profile"
+    />
+  ) : (
+    profile.avatar
+  )}
+</span>
+ <span className="profile-name">{profile.name}</span>
+</button>
         </header>
 
         {currentPage === "home" && (
           <>
-            <section className="hero">
-              <p className="eyebrow">WELCOME TO</p>
+            <section className="featured-artist">
+  <p className="eyebrow">FEATURED ARTIST</p>
 
-              <h1>Spotibai</h1>
+  <div className="featured-artist-content">
+    <div className="featured-artist-image">
+      {featuredArtist.image}
+    </div>
 
-              <p>
-                Listen to music, memes, and whatever else makes your playlist.
-              </p>
+    <div className="featured-artist-info">
+      <p className="featured-label">Artist</p>
 
-              <button
-                className="primary-button"
-                onClick={() => setCurrentPage("playlist")}
-              >
-                Playlist
-              </button>
-            </section>
+      <h1>{featuredArtist.name}</h1>
 
-            <section className="music-section">
+      <p>
+        {featuredArtist.description}
+      </p>
+
+      <button
+        className="primary-button"
+        onClick={() => playTrack(tracks[0])}
+      >
+        ▶ Play
+      </button>
+    </div>
+  </div>
+</section>
+
+            <section className="music-section recently-added-section">
               <div className="section-header">
-                <h2>Recently added</h2>
+                <h2 className="recently-added-title">Recently Added</h2>
                 <button className="show-all">Show all</button>
               </div>
 
@@ -520,6 +744,25 @@ const addComment = () => {
                 ))}
               </div>
             </section>
+
+            <section className="music-section popular-songs-section">
+  <div className="section-header">
+<h2 className="popular-songs-title">Popular Songs</h2>    <button className="show-all">Show all</button>
+  </div>
+
+  <div className="track-list home-track-list">
+    {tracks.map((track, index) => (
+      <TrackRow
+        key={track.id}
+        track={track}
+        index={index}
+        isLiked={likedTracks.includes(track.id)}
+        onLike={() => toggleLike(track.id)}
+        onPlay={() => playTrack(track)}
+      />
+    ))}
+  </div>
+</section>
           </>
         )}
 
@@ -837,6 +1080,160 @@ const addComment = () => {
   </div>
 )}
 
+{showProfile && (
+  <div className="profile-panel">
+    <div className="profile-header">
+      <div>
+        <p className="eyebrow">Profile</p>
+        <h2>Your Profile</h2>
+      </div>
+
+      <div className="profile-avatar-large">
+  {profileAvatar?.startsWith("data:image") ? (
+    <img
+      src={profileAvatar}
+      alt="Profile"
+    />
+  ) : (
+    profileAvatar
+  )}
+</div>
+
+      <button
+        className="profile-close"
+        onClick={() => setShowProfile(false)}
+      >
+        ×
+      </button>
+    </div>
+
+    <label className="profile-picture-label">
+  Profile picture
+</label>
+
+<input
+  type="file"
+  accept="image/*"
+  onChange={handleProfilePictureChange}
+/>
+
+    <label>Display name</label>
+
+    <input
+      type="text"
+      value={profileName}
+      onChange={(event) => setProfileName(event.target.value)}
+    />
+
+    <button
+      className="profile-save"
+      onClick={saveProfile}
+    >
+      Save Profile
+    </button>
+  </div>
+)}
+
+{showCropper && (
+  <div className="cropper-overlay">
+    <div className="cropper-modal">
+      <div className="cropper-header">
+        <div>
+          <p className="eyebrow">PROFILE PICTURE</p>
+          <h2>Adjust your picture</h2>
+        </div>
+
+        <button
+          className="cropper-close"
+          onClick={() => {
+            setShowCropper(false);
+            setCropImage(null);
+          }}
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+  className={`crop-area ${isDragging ? "dragging" : ""}`}
+  onPointerDown={handleCropPointerDown}
+  onPointerMove={handleCropPointerMove}
+  onPointerUp={handleCropPointerUp}
+  onPointerCancel={handleCropPointerUp}
+>
+  {cropImage && (
+    <img
+      src={cropImage}
+      alt="Crop preview"
+      className="crop-image"
+      onLoad={(event) => {
+        setCropImageDimensions({
+          width: event.currentTarget.naturalWidth,
+          height: event.currentTarget.naturalHeight,
+        });
+      }}
+      style={{
+  transform: `translate(-50%, -50%) translate(${cropPosition.x}px, ${cropPosition.y}px) scale(${(() => {
+    if (!cropImageDimensions.width || !cropImageDimensions.height) {
+      return 1;
+    }
+
+    const cropSize = 300;
+
+    const baseScale = Math.max(
+      cropSize / cropImageDimensions.width,
+      cropSize / cropImageDimensions.height
+    );
+
+    return baseScale * cropZoom;
+  })()})`,
+}}
+      draggable="false"
+    />
+  )}
+
+  <div className="crop-circle"></div>
+</div>
+
+      <div className="crop-controls">
+        <label>
+          Zoom
+        </label>
+
+        <input
+          type="range"
+          min="1"
+          max="3"
+          step="0.01"
+          value={cropZoom}
+          onChange={(event) =>
+            setCropZoom(Number(event.target.value))
+          }
+        />
+      </div>
+
+      <div className="cropper-actions">
+        <button
+          className="secondary-button"
+          onClick={() => {
+            setShowCropper(false);
+            setCropImage(null);
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+  className="primary-button"
+  onClick={createCroppedImage}
+>
+  Use Picture
+</button>
+      </div>
+    </div>
+  </div>
+)}
+
 {showComments && (
   <div className="comments-panel">
     <div className="comments-header">
@@ -862,8 +1259,15 @@ const addComment = () => {
         comments[currentTrack.id].map((comment) => (
           <div className="comment" key={comment.id}>
             <div className="comment-avatar">
-              👤
-            </div>
+  {comment.avatar?.startsWith("data:image") ? (
+    <img
+      src={comment.avatar}
+      alt={comment.author}
+    />
+  ) : (
+    comment.avatar || "👤"
+  )}
+</div>
 
             <div className="comment-content">
               <strong>{comment.author}</strong>
