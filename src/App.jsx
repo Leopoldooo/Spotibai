@@ -93,6 +93,26 @@ function App() {
   const [playlistName, setPlaylistName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showLyrics, setShowLyrics] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [profile, setProfile] = useState(() => {
+  const saved = localStorage.getItem("spotibai-profile");
+
+  return saved
+    ? JSON.parse(saved)
+    : {
+        name: "Phol",
+        avatar: "👤",
+      };
+});
+
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileName, setProfileName] = useState(profile.name);
+  const [comments, setComments] = useState(() => {
+  const saved = localStorage.getItem("spotibai-comments");
+  return saved ? JSON.parse(saved) : {};
+});
+
+const [commentText, setCommentText] = useState("");
 
   const playTrack = (track, queue = tracks) => {
   setPlayQueue(queue);
@@ -214,6 +234,36 @@ useEffect(() => {
     audioRef.current.currentTime = percentage * duration;
   };
 
+const addComment = () => {
+  const text = commentText.trim();
+
+  if (!text) {
+    return;
+  }
+
+  const newComment = {
+    id: Date.now(),
+    text,
+    author: profile.name,
+  };
+
+  const updatedComments = {
+    ...comments,
+    [currentTrack.id]: [
+      ...(comments[currentTrack.id] || []),
+      newComment,
+    ],
+  };
+
+  setComments(updatedComments);
+  localStorage.setItem(
+    "spotibai-comments",
+    JSON.stringify(updatedComments)
+  );
+
+  setCommentText("");
+};
+
   const toggleLike = (trackId) => {
     setLikedTracks((current) => {
       const updated = current.includes(trackId)
@@ -225,6 +275,27 @@ useEffect(() => {
       return updated;
     });
   };
+
+  const saveProfile = () => {
+  const name = profileName.trim();
+
+  if (!name) {
+    return;
+  }
+
+  const updatedProfile = {
+    ...profile,
+    name,
+  };
+
+  setProfile(updatedProfile);
+  localStorage.setItem(
+    "spotibai-profile",
+    JSON.stringify(updatedProfile)
+  );
+
+  setShowProfile(false);
+};
 
   const createPlaylist = () => {
     const name = playlistName.trim();
@@ -766,6 +837,63 @@ useEffect(() => {
   </div>
 )}
 
+{showComments && (
+  <div className="comments-panel">
+    <div className="comments-header">
+      <div>
+        <p className="eyebrow">Comments</p>
+        <h2>{currentTrack.title}</h2>
+      </div>
+
+      <button
+        className="comments-close"
+        onClick={() => setShowComments(false)}
+      >
+        ×
+      </button>
+    </div>
+
+    <div className="comments-list">
+      {(comments[currentTrack.id] || []).length === 0 ? (
+        <p className="no-comments">
+          No comments yet. Be the first to comment!
+        </p>
+      ) : (
+        comments[currentTrack.id].map((comment) => (
+          <div className="comment" key={comment.id}>
+            <div className="comment-avatar">
+              👤
+            </div>
+
+            <div className="comment-content">
+              <strong>{comment.author}</strong>
+              <p>{comment.text}</p>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+
+    <div className="comment-input-container">
+      <input
+        type="text"
+        placeholder="Write a comment..."
+        value={commentText}
+        onChange={(event) => setCommentText(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            addComment();
+          }
+        }}
+      />
+
+      <button onClick={addComment}>
+        Post
+      </button>
+    </div>
+  </div>
+)}
+
       <div className="player">
         <div className="now-playing">
           <div className="mini-cover">{currentTrack.emoji}</div>
@@ -853,6 +981,12 @@ useEffect(() => {
         </div>
 
         <div className="volume">
+          <button
+  className="comments-button"
+  onClick={() => setShowComments(!showComments)}
+>
+  💬
+</button>
   <button
     className="lyrics-button"
     onClick={() => setShowLyrics(!showLyrics)}
