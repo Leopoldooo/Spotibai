@@ -74,8 +74,66 @@ const tracks = [
   },
 ];
 
+const artists = [
+  {
+    id: 1,
+    name: "Spotibai",
+    description:
+      "The home of funny, memorable, and unexpected music from the Spotibai community.",
+    image: "🎵",
+  },
+  {
+    id: 2,
+    name: "EYY",
+    description:
+      "Funny and unexpected sounds from the Spotibai community.",
+    image: "😂",
+  },
+  {
+    id: 3,
+    name: "The 1975 - Jake Cuenca, Joseph Marco, and Enrique Gil",
+    description:
+      "The 1975 at home. Featuring unforgettable Filipino meme performances.",
+    image: "🎤",
+  },
+  {
+    id: 4,
+    name: "Bai",
+    description:
+      "Memorable sounds and songs from Bai.",
+    image: "🔊",
+  },
+];
+
+const albums = [
+  {
+    id: 1,
+    title: "Spotibai Originals",
+    artist: "Spotibai",
+    description: "Funny, memorable, and unexpected music.",
+    image: "🎵",
+    tracks: [1],
+  },
+  {
+    id: 2,
+    title: "Spotibai Memes",
+    artist: "Spotibai",
+    description: "A collection of unforgettable meme songs.",
+    image: "😂",
+    tracks: [2, 3, 4],
+  },
+];
+
 function App() {
   const [currentPage, setCurrentPage] = useState("home");
+const [navigationHistory, setNavigationHistory] = useState([
+  {
+    page: "home",
+    playlistId: null,
+  },
+]);
+const [navigationIndex, setNavigationIndex] = useState(0);
+const [isNavigatingHistory, setIsNavigatingHistory] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(tracks[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playQueue, setPlayQueue] = useState(tracks);
@@ -84,6 +142,102 @@ function App() {
   const [volume, setVolume] = useState(1);
 
   const audioRef = useRef(null);
+
+  const navigateToPage = (page, playlistId = null) => {
+  if (isNavigatingHistory) {
+    return;
+  }
+
+  const currentEntry = navigationHistory[navigationIndex];
+
+  if (
+    currentEntry &&
+    currentEntry.page === page &&
+    currentEntry.playlistId === playlistId
+  ) {
+    return;
+  }
+
+  const newHistory = navigationHistory.slice(
+    0,
+    navigationIndex + 1
+  );
+
+  newHistory.push({
+    page,
+    playlistId,
+  });
+
+  setNavigationHistory(newHistory);
+  setNavigationIndex(newHistory.length - 1);
+  setCurrentPage(page);
+
+  if (playlistId !== null) {
+    const playlist = playlists.find(
+      (item) => item.id === playlistId
+    );
+
+    if (playlist) {
+      setSelectedPlaylist(playlist);
+    }
+  } else if (page === "playlist") {
+    setSelectedPlaylist(null);
+  }
+};
+
+const handleUndo = () => {
+  if (navigationIndex <= 0) {
+    return;
+  }
+
+  const newIndex = navigationIndex - 1;
+  const entry = navigationHistory[newIndex];
+
+  setIsNavigatingHistory(true);
+  setNavigationIndex(newIndex);
+  setCurrentPage(entry.page);
+
+  if (entry.playlistId !== null) {
+    const playlist = playlists.find(
+      (item) => item.id === entry.playlistId
+    );
+
+    setSelectedPlaylist(playlist || null);
+  } else {
+    setSelectedPlaylist(null);
+  }
+
+  setTimeout(() => {
+    setIsNavigatingHistory(false);
+  }, 0);
+};
+
+const handleRedo = () => {
+  if (navigationIndex >= navigationHistory.length - 1) {
+    return;
+  }
+
+  const newIndex = navigationIndex + 1;
+  const entry = navigationHistory[newIndex];
+
+  setIsNavigatingHistory(true);
+  setNavigationIndex(newIndex);
+  setCurrentPage(entry.page);
+
+  if (entry.playlistId !== null) {
+    const playlist = playlists.find(
+      (item) => item.id === entry.playlistId
+    );
+
+    setSelectedPlaylist(playlist || null);
+  } else {
+    setSelectedPlaylist(null);
+  }
+
+  setTimeout(() => {
+    setIsNavigatingHistory(false);
+  }, 0);
+};
 
   const [likedTracks, setLikedTracks] = useState(() => {
   const saved = localStorage.getItem("spotibai-liked");
@@ -99,8 +253,14 @@ function App() {
   const [showCreatePlaylist, setShowCreatePlaylist] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchCategory, setSearchCategory] = useState("all");
+  const [selectedArtist, setSelectedArtist] = useState(null);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [showLyrics, setShowLyrics] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
+  const [draggedQueueTrack, setDraggedQueueTrack] = useState(null);
+  const [dragOverQueueTrack, setDragOverQueueTrack] = useState(null);
   const [profile, setProfile] = useState(() => {
   const saved = localStorage.getItem("spotibai-profile");
 
@@ -142,6 +302,18 @@ const [dragStart, setDragStart] = useState({
 });
 
 const [commentText, setCommentText] = useState("");
+
+const [replyText, setReplyText] = useState({});
+const [openReplies, setOpenReplies] = useState({});
+const [replyingTo, setReplyingTo] = useState({});
+
+const [commentSort, setCommentSort] = useState("newest");
+
+const [commentLikes, setCommentLikes] = useState(() => {
+  const saved = localStorage.getItem("spotibai-comment-likes");
+
+  return saved ? JSON.parse(saved) : {};
+});
 
   const playTrack = (track, queue = tracks) => {
   setPlayQueue(queue);
@@ -271,11 +443,13 @@ const addComment = () => {
   }
 
   const newComment = {
-  id: Date.now(),
-  text,
-  author: profile.name,
-  avatar: profile.avatar,
-};
+    id: Date.now(),
+    text,
+    author: profile.name,
+    avatar: profile.avatar,
+    createdAt: Date.now(),
+    replies: [],
+  };
 
   const updatedComments = {
     ...comments,
@@ -286,12 +460,168 @@ const addComment = () => {
   };
 
   setComments(updatedComments);
+
   localStorage.setItem(
     "spotibai-comments",
     JSON.stringify(updatedComments)
   );
 
   setCommentText("");
+};
+
+const toggleCommentLike = (commentId, replyId = null) => {
+  const key =
+    replyId === null
+      ? `comment-${commentId}`
+      : `reply-${commentId}-${replyId}`;
+
+  setCommentLikes((current) => {
+    const updated = {
+      ...current,
+      [key]: !current[key],
+    };
+
+    localStorage.setItem(
+      "spotibai-comment-likes",
+      JSON.stringify(updated)
+    );
+
+    return updated;
+  });
+};
+
+const getCommentLikeCount = (commentId, replyId = null) => {
+  const key =
+    replyId === null
+      ? `comment-${commentId}`
+      : `reply-${commentId}-${replyId}`;
+
+  return commentLikes[key] ? 1 : 0;
+};
+
+const sortComments = (commentList) => {
+  const sorted = [...commentList];
+
+  if (commentSort === "top") {
+    return sorted.sort((a, b) => {
+      const aLikes = getCommentLikeCount(a.id);
+      const bLikes = getCommentLikeCount(b.id);
+
+      if (bLikes !== aLikes) {
+        return bLikes - aLikes;
+      }
+
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+  }
+
+  return sorted.sort(
+    (a, b) =>
+      (b.createdAt || 0) - (a.createdAt || 0)
+  );
+};
+
+const deleteComment = (commentId) => {
+  const updatedComments = {
+    ...comments,
+    [currentTrack.id]: (comments[currentTrack.id] || []).filter(
+      (comment) => comment.id !== commentId
+    ),
+  };
+
+  setComments(updatedComments);
+
+  localStorage.setItem(
+    "spotibai-comments",
+    JSON.stringify(updatedComments)
+  );
+};
+
+const addReply = (commentId, parentReplyId = null) => {
+  const text = (replyText[commentId] || "").trim();
+
+  if (!text) {
+    return;
+  }
+
+  const newReply = {
+    id: Date.now(),
+    text,
+    author: profile.name,
+    avatar: profile.avatar,
+    createdAt: Date.now(),
+    parentReplyId,
+  };
+
+  const updatedComments = {
+    ...comments,
+    [currentTrack.id]: (comments[currentTrack.id] || []).map(
+      (comment) => {
+        if (comment.id !== commentId) {
+          return comment;
+        }
+
+        return {
+          ...comment,
+          replies: [
+            ...(comment.replies || []),
+            newReply,
+          ],
+        };
+      }
+    ),
+  };
+
+  setComments(updatedComments);
+
+  localStorage.setItem(
+    "spotibai-comments",
+    JSON.stringify(updatedComments)
+  );
+
+  setReplyText((current) => ({
+    ...current,
+    [commentId]: "",
+  }));
+
+  setReplyingTo((current) => ({
+    ...current,
+    [commentId]: null,
+  }));
+};
+
+const toggleReplies = (commentId) => {
+  setOpenReplies((current) => ({
+    ...current,
+    [commentId]: !current[commentId],
+  }));
+};
+
+const deleteReply = (commentId, replyId) => {
+  const updatedComments = {
+    ...comments,
+    [currentTrack.id]: (comments[currentTrack.id] || []).map(
+      (comment) => {
+        if (comment.id !== commentId) {
+          return comment;
+        }
+
+        return {
+          ...comment,
+          replies: (comment.replies || []).filter(
+            (reply) => reply.id !== replyId
+          ),
+        };
+      }
+    ),
+  };
+
+  setComments(updatedComments);
+
+  localStorage.setItem(
+    "spotibai-comments",
+    JSON.stringify(updatedComments)
+  );
 };
 
   const toggleLike = (trackId) => {
@@ -305,6 +635,58 @@ const addComment = () => {
       return updated;
     });
   };
+
+  const removeFromQueue = (trackId) => {
+  setPlayQueue((currentQueue) =>
+    currentQueue.filter((track) => track.id !== trackId)
+  );
+};
+
+const clearQueue = () => {
+  setPlayQueue([currentTrack]);
+};
+
+const addToQueue = (track) => {
+  setPlayQueue((currentQueue) => {
+    if (currentQueue.some((item) => item.id === track.id)) {
+      return currentQueue;
+    }
+
+    return [...currentQueue, track];
+  });
+};
+
+const swapQueueTracks = (draggedId, targetId) => {
+  if (
+    draggedId === null ||
+    targetId === null ||
+    draggedId === targetId
+  ) {
+    return;
+  }
+
+  setPlayQueue((currentQueue) => {
+    const draggedIndex = currentQueue.findIndex(
+      (track) => track.id === draggedId
+    );
+
+    const targetIndex = currentQueue.findIndex(
+      (track) => track.id === targetId
+    );
+
+    if (draggedIndex === -1 || targetIndex === -1) {
+      return currentQueue;
+    }
+
+    const updatedQueue = [...currentQueue];
+
+    const temp = updatedQueue[draggedIndex];
+    updatedQueue[draggedIndex] = updatedQueue[targetIndex];
+    updatedQueue[targetIndex] = temp;
+
+    return updatedQueue;
+  });
+};
 
   const handleProfilePictureChange = (event) => {
   const file = event.target.files[0];
@@ -574,19 +956,67 @@ const createCroppedImage = () => {
     likedTracks.includes(track.id)
   );
 
-  const searchResults = tracks.filter((track) => {
-    const query = searchQuery.trim().toLowerCase();
+  const normalizedSearch = searchQuery.trim().toLowerCase();
 
-    if (!query) {
-      return true;
-    }
+const filteredTracks = tracks.filter((track) => {
+  if (!normalizedSearch) {
+    return true;
+  }
 
-    return (
-      track.title.toLowerCase().includes(query) ||
-      track.creator.toLowerCase().includes(query) ||
-      track.description.toLowerCase().includes(query)
-    );
-  });
+  return (
+    track.title.toLowerCase().includes(normalizedSearch) ||
+    track.creator.toLowerCase().includes(normalizedSearch) ||
+    track.description.toLowerCase().includes(normalizedSearch)
+  );
+});
+
+const filteredArtists = artists.filter((artist) => {
+  if (!normalizedSearch) {
+    return true;
+  }
+
+  return (
+    artist.name.toLowerCase().includes(normalizedSearch) ||
+    artist.description.toLowerCase().includes(normalizedSearch)
+  );
+});
+
+const filteredAlbums = albums.filter((album) => {
+  if (!normalizedSearch) {
+    return true;
+  }
+
+  return (
+    album.title.toLowerCase().includes(normalizedSearch) ||
+    album.artist.toLowerCase().includes(normalizedSearch) ||
+    album.description.toLowerCase().includes(normalizedSearch)
+  );
+});
+
+const searchResults =
+  searchCategory === "songs"
+    ? filteredTracks
+    : searchCategory === "artists"
+    ? filteredArtists
+    : searchCategory === "albums"
+    ? filteredAlbums
+    : {
+        tracks: filteredTracks,
+        artists: filteredArtists,
+        albums: filteredAlbums,
+      };
+
+  const formatReplyUsername = (username) => {
+  const maxLength = 12;
+
+  if (!username) {
+    return "";
+  }
+
+  const limitedUsername = username.slice(0, maxLength - 1);
+
+  return `@${limitedUsername}`;
+};
 
   const formatTime = (time) => {
     if (!time || isNaN(time)) {
@@ -598,6 +1028,41 @@ const createCroppedImage = () => {
 
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
+
+  const formatCommentTime = (timestamp) => {
+  if (!timestamp) {
+    return "";
+  }
+
+  const now = Date.now();
+  const difference = now - timestamp;
+
+  const seconds = Math.floor(difference / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (seconds < 10) {
+    return "just now";
+  }
+
+  if (minutes < 1) {
+    return `${seconds} seconds ago`;
+  }
+
+  if (minutes < 60) {
+    return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
+  }
+
+  if (hours < 24) {
+    return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+  }
+
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+};
 
   return (
     <div className="app">
@@ -611,8 +1076,8 @@ const createCroppedImage = () => {
           <button
             className={`nav-item ${currentPage === "home" ? "active" : ""}`}
             onClick={() => {
-              setCurrentPage("home");
-              setSelectedPlaylist(null);
+            navigateToPage("home");
+            setSelectedPlaylist(null);
             }}
           >
             <span>⌂</span>
@@ -620,12 +1085,12 @@ const createCroppedImage = () => {
           </button>
 
           <button
-            className={`nav-item ${currentPage === "search" ? "active" : ""}`}
-            onClick={() => {
-              setCurrentPage("search");
-              setSelectedPlaylist(null);
-            }}
-          >
+  className={`nav-item ${currentPage === "search" ? "active" : ""}`}
+  onClick={() => {
+    navigateToPage("search");
+    setSelectedPlaylist(null);
+  }}
+>
             <span>🔍</span>
             Search
           </button>
@@ -640,27 +1105,27 @@ const createCroppedImage = () => {
           <p className="section-title">Your stuff</p>
 
           <button
-            className={`nav-item ${
-              currentPage === "playlist" ? "active" : ""
-            }`}
-            onClick={() => {
-              setCurrentPage("playlist");
-              setSelectedPlaylist(null);
-            }}
-          >
+  className={`nav-item ${
+    currentPage === "playlist" ? "active" : ""
+  }`}
+  onClick={() => {
+    navigateToPage("playlist");
+    setSelectedPlaylist(null);
+  }}
+>
             <span>＋</span>
             Playlist
           </button>
 
           <button
-            className={`nav-item ${
-              currentPage === "liked" ? "active" : ""
-            }`}
-            onClick={() => {
-              setCurrentPage("liked");
-              setSelectedPlaylist(null);
-            }}
-          >
+  className={`nav-item ${
+    currentPage === "liked" ? "active" : ""
+  }`}
+  onClick={() => {
+    navigateToPage("liked");
+    setSelectedPlaylist(null);
+  }}
+>
             <span>♡</span>
             Liked Songs
           </button>
@@ -670,9 +1135,22 @@ const createCroppedImage = () => {
       <main className="main-content">
         <header className="top-bar">
           <div className="navigation-buttons">
-            <button>‹</button>
-            <button>›</button>
-          </div>
+  <button
+    onClick={handleUndo}
+    disabled={navigationIndex <= 0}
+  >
+    ‹
+  </button>
+
+  <button
+    onClick={handleRedo}
+    disabled={
+      navigationIndex >= navigationHistory.length - 1
+    }
+  >
+    ›
+  </button>
+</div>
 
           <button
   className="profile-button"
@@ -695,152 +1173,659 @@ const createCroppedImage = () => {
 </button>
         </header>
 
-        {currentPage === "home" && (
-          <>
-            <section className="featured-artist">
-  <p className="eyebrow">FEATURED ARTIST</p>
+       {currentPage === "home" && (
+  <div className="home-layout">
+    <main className="home-main">
+    <section className="featured-artist">
+      <p className="eyebrow">FEATURED ARTIST</p>
 
-  <div className="featured-artist-content">
-    <div className="featured-artist-image">
-      {featuredArtist.image}
-    </div>
+      <div className="featured-artist-content">
+        <div className="featured-artist-image">
+          {featuredArtist.image}
+        </div>
 
-    <div className="featured-artist-info">
-      <p className="featured-label">Artist</p>
+        <div className="featured-artist-info">
+          <p className="featured-label">Artist</p>
 
-      <h1>{featuredArtist.name}</h1>
+          <h1>{featuredArtist.name}</h1>
 
-      <p>
-        {featuredArtist.description}
-      </p>
+          <p>{featuredArtist.description}</p>
 
-      <button
-        className="primary-button"
-        onClick={() => playTrack(tracks[0])}
-      >
-        ▶ Play
-      </button>
-    </div>
+          <button
+            className="primary-button"
+            onClick={() => playTrack(tracks[0])}
+          >
+            ▶ Play
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section className="music-section recently-added-section">
+      <div className="section-header">
+        <h2 className="recently-added-title">Recently Added</h2>
+        <button className="show-all">Show all</button>
+      </div>
+
+      <div className="music-grid">
+        {tracks.map((track) => (
+          <TrackCard
+            key={track.id}
+            track={track}
+            isLiked={likedTracks.includes(track.id)}
+            onPlay={() => playTrack(track)}
+            onLike={() => toggleLike(track.id)}
+            playlists={playlists}
+            onAddToPlaylist={addTrackToPlaylist}
+            onAddToQueue={addToQueue}
+          />
+        ))}
+      </div>
+    </section>
+
+    <section className="music-section popular-songs-section">
+      <div className="section-header">
+        <h2 className="popular-songs-title">Popular Songs</h2>
+        <button className="show-all">Show all</button>
+      </div>
+
+      <div className="track-list home-track-list">
+        {tracks.map((track, index) => (
+          <TrackRow
+            key={track.id}
+            track={track}
+            index={index}
+            isLiked={likedTracks.includes(track.id)}
+            onLike={() => toggleLike(track.id)}
+            onPlay={() => playTrack(track)}
+            onAddToQueue={addToQueue}
+          />
+        ))}
+      </div>
+    </section>
+     </main>
+
+      <aside className="artist-panel">
+  <div className="artist-panel-header">
+    Now Playing
   </div>
-</section>
 
-            <section className="music-section recently-added-section">
-              <div className="section-header">
-                <h2 className="recently-added-title">Recently Added</h2>
-                <button className="show-all">Show all</button>
-              </div>
-
-              <div className="music-grid">
-                {tracks.map((track) => (
-                  <TrackCard
-                    key={track.id}
-                    track={track}
-                    isLiked={likedTracks.includes(track.id)}
-                    onPlay={() => playTrack(track)}
-                    onLike={() => toggleLike(track.id)}
-                    playlists={playlists}
-                    onAddToPlaylist={addTrackToPlaylist}
-                  />
-                ))}
-              </div>
-            </section>
-
-            <section className="music-section popular-songs-section">
-  <div className="section-header">
-<h2 className="popular-songs-title">Popular Songs</h2>    <button className="show-all">Show all</button>
+  <div className="artist-panel-image">
+    {currentTrack.emoji}
   </div>
 
-  <div className="track-list home-track-list">
-    {tracks.map((track, index) => (
-      <TrackRow
-        key={track.id}
-        track={track}
-        index={index}
-        isLiked={likedTracks.includes(track.id)}
-        onLike={() => toggleLike(track.id)}
-        onPlay={() => playTrack(track)}
-      />
-    ))}
+  <div className="artist-panel-song">
+    <h2>{currentTrack.title}</h2>
+    <p>{currentTrack.creator}</p>
   </div>
-</section>
-          </>
-        )}
+
+  <div className="artist-info-box">
+    <h3>About the artist</h3>
+
+    <p>
+      {currentTrack.creator} is featured on Spotibai with
+      funny, memorable, and unexpected music.
+    </p>
+  </div>
+
+  <div className="queue-box">
+    <h3>Next on queue</h3>
+
+    {(() => {
+      const currentIndex = playQueue.findIndex(
+        (track) => track.id === currentTrack.id
+      );
+
+      const nextTrack =
+        currentIndex >= 0
+          ? playQueue[(currentIndex + 1) % playQueue.length]
+          : playQueue[0];
+
+      if (!nextTrack || nextTrack.id === currentTrack.id) {
+        return (
+          <p className="queue-empty">
+            No other songs in queue
+          </p>
+        );
+      }
+
+      return (
+        <button
+          className="next-queue-item"
+          onClick={() => playTrack(nextTrack, playQueue)}
+        >
+          <span className="next-queue-image">
+            {nextTrack.emoji}
+          </span>
+
+          <span className="next-queue-info">
+            <strong>{nextTrack.title}</strong>
+            <small>{nextTrack.creator}</small>
+          </span>
+        </button>
+      );
+    })()}
+  </div>
+</aside>
+
+  </div>
+)}
 
         {currentPage === "search" && (
-          <section className="page-section">
-            <div className="page-heading">
-              <p className="eyebrow">DISCOVER</p>
+  <section className="page-section search-page">
+    <div className="page-heading">
+      <p className="eyebrow">DISCOVER</p>
 
-              <h1>Search</h1>
+      <h1>Search</h1>
 
-              <p>Find tracks on Spotibai.</p>
+      <p>Find tracks, artists, and albums on Spotibai.</p>
+    </div>
+
+    <div className="search-container">
+      <span className="search-icon">🔍</span>
+
+      <input
+        type="text"
+        className="search-input"
+        placeholder="Search for a track, artist, or album..."
+        value={searchQuery}
+        onChange={(event) => setSearchQuery(event.target.value)}
+        autoFocus
+      />
+
+      {searchQuery && (
+        <button
+          className="clear-search"
+          onClick={() => setSearchQuery("")}
+        >
+          ×
+        </button>
+      )}
+    </div>
+
+    <div className="search-filters">
+      <button
+        className={`search-filter ${
+          searchCategory === "all" ? "active" : ""
+        }`}
+        onClick={() => setSearchCategory("all")}
+      >
+        All
+      </button>
+
+      <button
+        className={`search-filter ${
+          searchCategory === "songs" ? "active" : ""
+        }`}
+        onClick={() => setSearchCategory("songs")}
+      >
+        Songs
+      </button>
+
+      <button
+        className={`search-filter ${
+          searchCategory === "artists" ? "active" : ""
+        }`}
+        onClick={() => setSearchCategory("artists")}
+      >
+        Artists
+      </button>
+
+      <button
+        className={`search-filter ${
+          searchCategory === "albums" ? "active" : ""
+        }`}
+        onClick={() => setSearchCategory("albums")}
+      >
+        Albums
+      </button>
+    </div>
+
+    {!searchQuery.trim() ? (
+      <>
+        {(searchCategory === "all" ||
+          searchCategory === "songs") && (
+          <section className="music-section search-recommended-section">
+            <div className="section-header">
+              <h2>Recommended Songs</h2>
             </div>
 
-            <div className="search-container">
-              <span className="search-icon">🔍</span>
+            <div className="track-list search-track-list">
+              {tracks.map((track, index) => (
+                <TrackRow
+                  key={track.id}
+                  track={track}
+                  index={index}
+                  isLiked={likedTracks.includes(track.id)}
+                  onLike={() => toggleLike(track.id)}
+                  onPlay={() => playTrack(track)}
+                  onAddToQueue={addToQueue}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search for a track..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                autoFocus
-              />
+        {(searchCategory === "all" ||
+          searchCategory === "artists") && (
+          <section className="music-section search-recommended-section">
+            <div className="section-header">
+              <h2>Recommended Artists</h2>
+            </div>
 
-              {searchQuery && (
+            <div className="search-artists-grid">
+              {artists.map((artist) => (
                 <button
-                  className="clear-search"
-                  onClick={() => setSearchQuery("")}
+                  key={artist.id}
+                  className="search-artist-card"
+                  onClick={() => {
+  setSelectedArtist(artist);
+  navigateToPage("artist");
+}}
                 >
-                  ×
+                  <div className="search-artist-image">
+                    {artist.image}
+                  </div>
+
+                  <div className="search-artist-info">
+                    <h3>{artist.name}</h3>
+                    <p>Artist</p>
+                  </div>
                 </button>
-              )}
+              ))}
             </div>
+          </section>
+        )}
+
+        {(searchCategory === "all" ||
+          searchCategory === "albums") && (
+          <section className="music-section search-recommended-section">
+            <div className="section-header">
+              <h2>Recommended Albums</h2>
+            </div>
+
+            <div className="search-albums-grid">
+              {albums.map((album) => (
+                <button
+  key={album.id}
+  className="search-album-card"
+  onClick={() => {
+    setSelectedAlbum(album);
+    setCurrentPage("album");
+  }}
+>
+  <div className="search-album-image">
+    {album.image}
+  </div>
+
+  <div className="search-album-info">
+    <h3>{album.title}</h3>
+    <p>{album.artist}</p>
+  </div>
+</button>
+              ))}
+            </div>
+          </section>
+        )}
+      </>
+    ) : (
+      <>
+        {searchCategory === "all" && (
+          <>
+            <section className="music-section search-results-section">
+              <div className="section-header">
+                <h2>Artists</h2>
+              </div>
+
+              {filteredArtists.length === 0 ? (
+                <p className="search-empty-text">
+                  No artists found.
+                </p>
+              ) : (
+                <div className="search-artists-grid">
+                  {filteredArtists.map((artist) => (
+                    <button
+                      key={artist.id}
+                      className="search-artist-card"
+                      onClick={() => {
+  setSelectedArtist(artist);
+  navigateToPage("artist");
+}}
+                    >
+                      <div className="search-artist-image">
+                        {artist.image}
+                      </div>
+
+                      <div className="search-artist-info">
+                        <h3>{artist.name}</h3>
+                        <p>Artist</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </section>
 
             <section className="music-section search-results-section">
               <div className="section-header">
-                <h2>
-                  {searchQuery.trim()
-                    ? `Results for "${searchQuery}"`
-                    : "All tracks"}
-                </h2>
-
-                <span className="search-result-count">
-                  {searchResults.length}{" "}
-                  {searchResults.length === 1 ? "track" : "tracks"}
-                </span>
+                <h2>Songs</h2>
               </div>
 
-              {searchResults.length === 0 ? (
-                <div className="empty-playlist">
-                  <div className="empty-icon">🔍</div>
-
-                  <h2>No tracks found</h2>
-
-                  <p>
-                    Try searching for a different track, creator, or
-                    description.
-                  </p>
-                </div>
+              {filteredTracks.length === 0 ? (
+                <p className="search-empty-text">
+                  No songs found.
+                </p>
               ) : (
-                <div className="music-grid">
-                  {searchResults.map((track) => (
-                    <TrackCard
+                <div className="track-list search-track-list">
+                  {filteredTracks.map((track, index) => (
+                    <TrackRow
                       key={track.id}
                       track={track}
+                      index={index}
                       isLiked={likedTracks.includes(track.id)}
-                      onPlay={() => playTrack(track)}
                       onLike={() => toggleLike(track.id)}
-                      playlists={playlists}
-                      onAddToPlaylist={addTrackToPlaylist}
+                      onPlay={() => playTrack(track)}
+                      onAddToQueue={addToQueue}
                     />
                   ))}
                 </div>
               )}
             </section>
+
+            <section className="music-section search-results-section">
+              <div className="section-header">
+                <h2>Albums</h2>
+              </div>
+
+              {filteredAlbums.length === 0 ? (
+                <p className="search-empty-text">
+                  No albums found.
+                </p>
+              ) : (
+                <div className="search-albums-grid">
+                  {filteredAlbums.map((album) => (
+                    <button
+  key={album.id}
+  className="search-album-card"
+  onClick={() => {
+    setSelectedAlbum(album);
+    navigateToPage("album");
+  }}
+>
+  <div className="search-album-image">
+    {album.image}
+  </div>
+
+  <div className="search-album-info">
+    <h3>{album.title}</h3>
+    <p>{album.artist}</p>
+  </div>
+</button>
+                  ))}
+                </div>
+              )}
+            </section>
+          </>
+        )}
+
+        {searchCategory === "songs" && (
+          <section className="music-section search-results-section">
+            <div className="section-header">
+              <h2>Songs</h2>
+              <span className="search-result-count">
+                {filteredTracks.length}{" "}
+                {filteredTracks.length === 1 ? "song" : "songs"}
+              </span>
+            </div>
+
+            {filteredTracks.length === 0 ? (
+              <div className="empty-playlist">
+                <div className="empty-icon">🔍</div>
+
+                <h2>No songs found</h2>
+
+                <p>
+                  Try searching for a different song or creator.
+                </p>
+              </div>
+            ) : (
+              <div className="track-list search-track-list">
+                {filteredTracks.map((track, index) => (
+                  <TrackRow
+                    key={track.id}
+                    track={track}
+                    index={index}
+                    isLiked={likedTracks.includes(track.id)}
+                    onLike={() => toggleLike(track.id)}
+                    onPlay={() => playTrack(track)}
+                    onAddToQueue={addToQueue}
+                  />
+                ))}
+              </div>
+            )}
           </section>
         )}
+
+        {searchCategory === "artists" && (
+          <section className="music-section search-results-section">
+            <div className="section-header">
+              <h2>Artists</h2>
+              <span className="search-result-count">
+                {filteredArtists.length}{" "}
+                {filteredArtists.length === 1 ? "artist" : "artists"}
+              </span>
+            </div>
+
+            {filteredArtists.length === 0 ? (
+              <div className="empty-playlist">
+                <div className="empty-icon">👤</div>
+
+                <h2>No artists found</h2>
+
+                <p>
+                  Try searching for a different artist.
+                </p>
+              </div>
+            ) : (
+              <div className="search-artists-grid">
+                {filteredArtists.map((artist) => (
+                  <button
+                    key={artist.id}
+                    className="search-artist-card"
+                    onClick={() => {
+  setSelectedArtist(artist);
+  navigateToPage("artist");
+}}
+                  >
+                    <div className="search-artist-image">
+                      {artist.image}
+                    </div>
+
+                    <div className="search-artist-info">
+                      <h3>{artist.name}</h3>
+                      <p>Artist</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {searchCategory === "albums" && (
+          <section className="music-section search-results-section">
+            <div className="section-header">
+              <h2>Albums</h2>
+              <span className="search-result-count">
+                {filteredAlbums.length}{" "}
+                {filteredAlbums.length === 1 ? "album" : "albums"}
+              </span>
+            </div>
+
+            {filteredAlbums.length === 0 ? (
+              <div className="empty-playlist">
+                <div className="empty-icon">💿</div>
+
+                <h2>No albums found</h2>
+
+                <p>
+                  Try searching for a different album.
+                </p>
+              </div>
+            ) : (
+              <div className="search-albums-grid">
+                {filteredAlbums.map((album) => (
+                  <button
+  key={album.id}
+  className="search-album-card"
+  onClick={() => {
+    setSelectedAlbum(album);
+    navigateToPage("album");
+  }}
+>
+  <div className="search-album-image">
+    {album.image}
+  </div>
+
+  <div className="search-album-info">
+    <h3>{album.title}</h3>
+    <p>{album.artist}</p>
+  </div>
+</button>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+      </>
+    )}
+  </section>
+)}
+
+{currentPage === "artist" && selectedArtist && (
+  <section className="page-section artist-page">
+    <button
+      className="back-button"
+      onClick={() => {
+  setSelectedArtist(null);
+  navigateToPage("search");
+}}
+    >
+      ← Back to search
+    </button>
+
+    <div className="artist-profile-header">
+      <div className="artist-profile-image">
+        {selectedArtist.image}
+      </div>
+
+      <div className="artist-profile-info">
+        <p className="eyebrow">ARTIST</p>
+
+        <h1>{selectedArtist.name}</h1>
+
+        <p>{selectedArtist.description}</p>
+      </div>
+    </div>
+
+    <section className="music-section artist-songs-section">
+      <div className="section-header">
+        <h2>Songs</h2>
+      </div>
+
+      <div className="track-list">
+        {tracks
+          .filter(
+            (track) =>
+              track.creator.toLowerCase() ===
+              selectedArtist.name.toLowerCase()
+          )
+          .map((track, index) => (
+            <TrackRow
+              key={track.id}
+              track={track}
+              index={index}
+              isLiked={likedTracks.includes(track.id)}
+              onLike={() => toggleLike(track.id)}
+              onPlay={() => playTrack(track)}
+              onAddToQueue={addToQueue}
+            />
+          ))}
+      </div>
+    </section>
+  </section>
+)}
+
+{currentPage === "album" && selectedAlbum && (
+  <section className="page-section album-page">
+    <button
+      className="back-button"
+      onClick={() => {
+  setSelectedArtist(null);
+  navigateToPage("search");
+}}
+    >
+      ← Back to search
+    </button>
+
+    <div className="album-profile-header">
+      <div className="album-profile-image">
+        {selectedAlbum.image}
+      </div>
+
+      <div className="album-profile-info">
+        <p className="eyebrow">ALBUM</p>
+
+        <h1>{selectedAlbum.title}</h1>
+
+        <p className="album-artist-name">
+          {selectedAlbum.artist}
+        </p>
+
+        <p>{selectedAlbum.description}</p>
+
+        <p className="album-track-count">
+          {selectedAlbum.tracks.length}{" "}
+          {selectedAlbum.tracks.length === 1 ? "song" : "songs"}
+        </p>
+      </div>
+    </div>
+
+    <section className="music-section album-songs-section">
+      <div className="section-header">
+        <h2>Songs</h2>
+      </div>
+
+      <div className="track-list">
+        {selectedAlbum.tracks
+          .map((trackId) =>
+            tracks.find((track) => track.id === trackId)
+          )
+          .filter(Boolean)
+          .map((track, index) => (
+            <TrackRow
+              key={track.id}
+              track={track}
+              index={index}
+              isLiked={likedTracks.includes(track.id)}
+              onLike={() => toggleLike(track.id)}
+              onAddToQueue={addToQueue}
+              onPlay={() =>
+                playTrack(
+                  track,
+                  selectedAlbum.tracks
+                    .map((trackId) =>
+                      tracks.find((track) => track.id === trackId)
+                    )
+                    .filter(Boolean)
+                )
+              }
+            />
+          ))}
+      </div>
+    </section>
+  </section>
+)}
 
         {currentPage === "playlist" && !selectedPlaylist && (
           <section className="page-section">
@@ -883,10 +1868,12 @@ const createCroppedImage = () => {
               <div className="playlist-grid">
                 {playlists.map((playlist) => (
                   <div
-                    className="playlist-card"
-                    key={playlist.id}
-                    onClick={() => setSelectedPlaylist(playlist)}
-                  >
+  className="playlist-card"
+  key={playlist.id}
+  onClick={() => {
+    navigateToPage("playlist", playlist.id);
+  }}
+>
                     <div className="playlist-cover">♫</div>
 
                     <h3>{playlist.name}</h3>
@@ -916,7 +1903,11 @@ const createCroppedImage = () => {
           <PlaylistPage
             playlist={selectedPlaylist}
             tracks={tracks}
-            onBack={() => setSelectedPlaylist(null)}
+            onBack={() => {
+  setSelectedPlaylist(null);
+  navigateToPage("playlist");
+}}
+onAddToQueue={addToQueue}
             onPlay={(track) => {
             const playlistTracks = tracks.filter((item) =>
             selectedPlaylist.tracks.includes(item.id)
@@ -1034,10 +2025,16 @@ const createCroppedImage = () => {
     (track) => track.id === currentTrack.id
   );
 
-  const nextIndex =
-    currentIndex < playQueue.length - 1 ? currentIndex + 1 : 0;
+  if (
+    currentIndex === -1 ||
+    currentIndex >= playQueue.length - 1
+  ) {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    return;
+  }
 
-  const nextTrack = playQueue[nextIndex];
+  const nextTrack = playQueue[currentIndex + 1];
 
   setCurrentTrack(nextTrack);
   setCurrentTime(0);
@@ -1237,51 +2234,413 @@ const createCroppedImage = () => {
 {showComments && (
   <div className="comments-panel">
     <div className="comments-header">
-      <div>
-        <p className="eyebrow">Comments</p>
-        <h2>{currentTrack.title}</h2>
-      </div>
+  <div className="comments-header-center">
+    <h2>Comments</h2>
 
-      <button
-        className="comments-close"
-        onClick={() => setShowComments(false)}
-      >
-        ×
-      </button>
-    </div>
+    <select
+      className="comment-sort-select"
+      value={commentSort}
+      onChange={(event) =>
+        setCommentSort(event.target.value)
+      }
+    >
+      <option value="newest">
+        New comments
+      </option>
 
-    <div className="comments-list">
-      {(comments[currentTrack.id] || []).length === 0 ? (
-        <p className="no-comments">
-          No comments yet. Be the first to comment!
-        </p>
-      ) : (
-        comments[currentTrack.id].map((comment) => (
-          <div className="comment" key={comment.id}>
-            <div className="comment-avatar">
-  {comment.avatar?.startsWith("data:image") ? (
-    <img
-      src={comment.avatar}
-      alt={comment.author}
-    />
-  ) : (
-    comment.avatar || "👤"
-  )}
+      <option value="top">
+        Top liked
+      </option>
+    </select>
+  </div>
+
+  <button
+    className="comments-close"
+    onClick={() => setShowComments(false)}
+  >
+    ×
+  </button>
 </div>
 
-            <div className="comment-content">
-              <strong>{comment.author}</strong>
-              <p>{comment.text}</p>
+    <div className="comments-list">
+  {(comments[currentTrack.id] || []).length === 0 ? (
+  <p className="no-comments">
+    No comments yet. Be the first to comment!
+  </p>
+) : (
+  sortComments(comments[currentTrack.id]).map((comment) => {
+    const replies = comment.replies || [];
+
+    const rootReplies = replies.filter(
+      (reply) => !reply.parentReplyId
+    );
+
+    const nestedReplies = replies.filter(
+      (reply) => reply.parentReplyId
+    );
+
+    return (
+      <div className="comment-thread" key={comment.id}>
+        <div className="comment">
+          <div className="comment-avatar">
+            {comment.avatar?.startsWith("data:image") ? (
+              <img
+                src={comment.avatar}
+                alt={comment.author}
+              />
+            ) : (
+              comment.avatar || "👤"
+            )}
+          </div>
+
+          <div className="comment-content">
+            <div className="comment-author-row">
+              <strong className="comment-author">
+                {comment.author}
+              </strong>
+
+              <span className="comment-timestamp">
+                {formatCommentTime(comment.createdAt)}
+              </span>
+            </div>
+
+            <p>{comment.text}</p>
+
+            <div className="comment-actions">
+              <button
+  className={`comment-like-button ${
+    commentLikes[`comment-${comment.id}`]
+      ? "liked"
+      : ""
+  }`}
+  onClick={() =>
+    toggleCommentLike(comment.id)
+  }
+>
+  {commentLikes[`comment-${comment.id}`]
+    ? "♥"
+    : "♡"}
+
+  <span>
+    {getCommentLikeCount(comment.id)}
+  </span>
+</button>
+              <button  
+                onClick={() => {
+                  setReplyingTo((current) => ({
+                    ...current,
+                    [comment.id]: null,
+                  }));
+
+                  setOpenReplies((current) => ({
+                    ...current,
+                    [comment.id]: true,
+                  }));
+                }}
+              >
+                Reply
+              </button>
+
+              <button
+                onClick={() => deleteComment(comment.id)}
+              >
+                Delete
+              </button>
             </div>
           </div>
-        ))
-      )}
-    </div>
+        </div>
+
+        {replies.length > 0 && (
+          <button
+            className="replies-toggle"
+            onClick={() => toggleReplies(comment.id)}
+          >
+            {openReplies[comment.id]
+              ? "▲ Hide replies"
+              : `▼ ${replies.length} ${
+                  replies.length === 1 ? "reply" : "replies"
+                }`}
+          </button>
+        )}
+
+        {openReplies[comment.id] && (
+          <div className="replies-list">
+            {rootReplies.map((reply) => {
+              const childReplies = nestedReplies.filter(
+                (child) =>
+                  child.parentReplyId === reply.id
+              );
+
+              return (
+                <div key={reply.id}>
+                  <div className="reply">
+                    <div className="comment-avatar reply-avatar">
+                      {reply.avatar?.startsWith("data:image") ? (
+                        <img
+                          src={reply.avatar}
+                          alt={reply.author}
+                        />
+                      ) : (
+                        reply.avatar || "👤"
+                      )}
+                    </div>
+
+                    <div className="comment-content">
+                      <div className="comment-author-row">
+                        <strong className="comment-author">
+                          {reply.author}
+                        </strong>
+
+                        <span className="comment-timestamp">
+                          {formatCommentTime(reply.createdAt)}
+                        </span>
+                      </div>
+
+                      <p>
+                        {reply.text}
+                      </p>
+
+                      <div className="comment-actions">
+                        <button
+  className={`comment-like-button ${
+    commentLikes[
+      `reply-${comment.id}-${reply.id}`
+    ]
+      ? "liked"
+      : ""
+  }`}
+  onClick={() =>
+    toggleCommentLike(
+      comment.id,
+      reply.id
+    )
+  }
+>
+  {commentLikes[
+    `reply-${comment.id}-${reply.id}`
+  ]
+    ? "♥"
+    : "♡"}
+
+  <span>
+    {getCommentLikeCount(
+      comment.id,
+      reply.id
+    )}
+  </span>
+</button>
+                        <button
+                          onClick={() => {
+  setReplyingTo((current) => ({
+    ...current,
+    [comment.id]: reply.id,
+  }));
+
+  setReplyText((current) => ({
+  ...current,
+  [comment.id]: `${formatReplyUsername(reply.author)} `,
+}));
+
+  setOpenReplies((current) => ({
+    ...current,
+    [comment.id]: true,
+  }));
+}}
+                        >
+                          Reply
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            deleteReply(
+                              comment.id,
+                              reply.id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {childReplies.map((childReply) => (
+                    <div
+                      className="nested-reply"
+                      key={childReply.id}
+                    >
+                      <div className="comment-avatar reply-avatar">
+                        {childReply.avatar?.startsWith(
+                          "data:image"
+                        ) ? (
+                          <img
+                            src={childReply.avatar}
+                            alt={childReply.author}
+                          />
+                        ) : (
+                          childReply.avatar || "👤"
+                        )}
+                      </div>
+
+                      <div className="comment-content">
+                        <div className="comment-author-row">
+                          <strong className="comment-author">
+                            {childReply.author}
+                          </strong>
+
+                          <span className="comment-timestamp">
+                            {formatCommentTime(
+                              childReply.createdAt
+                            )}
+                          </span>
+                        </div>
+
+                        <p>
+                          {childReply.text}
+                        </p>
+
+                        <div className="comment-actions">
+                          <button
+  className={`comment-like-button ${
+    commentLikes[
+      `reply-${comment.id}-${childReply.id}`
+    ]
+      ? "liked"
+      : ""
+  }`}
+  onClick={() =>
+    toggleCommentLike(
+      comment.id,
+      childReply.id
+    )
+  }
+>
+  {commentLikes[
+    `reply-${comment.id}-${childReply.id}`
+  ]
+    ? "♥"
+    : "♡"}
+
+  <span>
+    {getCommentLikeCount(
+      comment.id,
+      childReply.id
+    )}
+  </span>
+</button>
+                          <button
+                            onClick={() => {
+  setReplyingTo((current) => ({
+    ...current,
+    [comment.id]: childReply.id,
+  }));
+
+  setReplyText((current) => ({
+  ...current,
+  [comment.id]: `${formatReplyUsername(childReply.author)} `,
+}));
+
+  setOpenReplies((current) => ({
+    ...current,
+    [comment.id]: true,
+  }));
+}}
+                          >
+                            Reply
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              deleteReply(
+                                comment.id,
+                                childReply.id
+                              )
+                            }
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {openReplies[comment.id] && (
+          <div className="reply-input-container">
+            {replyingTo[comment.id] && (
+              <div className="replying-to">
+                Replying to{" "}
+                <strong>
+                  {
+                    replies.find(
+                      (reply) =>
+                        reply.id ===
+                        replyingTo[comment.id]
+                    )?.author
+                  }
+                </strong>
+
+                <button
+                  onClick={() =>
+                    setReplyingTo((current) => ({
+                      ...current,
+                      [comment.id]: null,
+                    }))
+                  }
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
+            <input
+              type="text"
+              placeholder="Write a reply..."
+              value={replyText[comment.id] || ""}
+              maxLength={50}
+              onChange={(event) =>
+                setReplyText((current) => ({
+                  ...current,
+                  [comment.id]: event.target.value,
+                }))
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  addReply(
+                    comment.id,
+                    replyingTo[comment.id] || null
+                  );
+                }
+              }}
+            />
+
+            <button
+              onClick={() =>
+                addReply(
+                  comment.id,
+                  replyingTo[comment.id] || null
+                )
+              }
+            >
+              Reply
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  })
+)}
+</div>
 
     <div className="comment-input-container">
       <input
         type="text"
         placeholder="Write a comment..."
+        maxLength={50}
         value={commentText}
         onChange={(event) => setCommentText(event.target.value)}
         onKeyDown={(event) => {
@@ -1294,6 +2653,190 @@ const createCroppedImage = () => {
       <button onClick={addComment}>
         Post
       </button>
+    </div>
+  </div>
+)}
+
+{showQueue && (
+  <div className="queue-panel">
+    <div className="queue-panel-header">
+      <div>
+        <p className="eyebrow">PLAYING NEXT</p>
+        <h2>Queue</h2>
+      </div>
+
+      <button
+        className="queue-close"
+        onClick={() => setShowQueue(false)}
+      >
+        ×
+      </button>
+    </div>
+
+    <div className="queue-current">
+      <p className="queue-section-label">
+        Now playing
+      </p>
+
+      <div className="queue-track current">
+        <div className="queue-track-cover">
+          {currentTrack.emoji}
+        </div>
+
+        <div className="queue-track-info">
+          <strong>{currentTrack.title}</strong>
+          <span>{currentTrack.creator}</span>
+        </div>
+
+        <span className="queue-playing-icon">
+          {isPlaying ? "♫" : "Ⅱ"}
+        </span>
+      </div>
+    </div>
+
+    <div className="queue-up-next">
+      <div className="queue-section-header">
+        <p className="queue-section-label">
+          Next in queue
+        </p>
+
+        {playQueue.length > 1 && (
+          <button
+            className="queue-clear-button"
+            onClick={clearQueue}
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
+      {playQueue.filter(
+        (track) => track.id !== currentTrack.id
+      ).length === 0 ? (
+        <div className="queue-empty-state">
+          <span>☷</span>
+
+          <p>No songs in queue</p>
+
+          <small>
+            Play a song from your library to build your queue.
+          </small>
+        </div>
+      ) : (
+        <div className="queue-track-list">
+          {playQueue
+            .filter(
+              (track) => track.id !== currentTrack.id
+            )
+            .map((track) => (
+              <div
+  className={`queue-track ${
+    draggedQueueTrack === track.id
+      ? "queue-track-dragging"
+      : ""
+  } ${
+    dragOverQueueTrack === track.id
+      ? "queue-track-drag-over"
+      : ""
+  }`}
+  key={track.id}
+  onPointerDown={(event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    setDraggedQueueTrack(track.id);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }}
+  onPointerMove={(event) => {
+    if (draggedQueueTrack === null) {
+      return;
+    }
+
+    const element = document.elementFromPoint(
+      event.clientX,
+      event.clientY
+    );
+
+    const queueItem = element?.closest(".queue-track");
+
+    if (!queueItem) {
+      setDragOverQueueTrack(null);
+      return;
+    }
+
+    const targetId = Number(queueItem.dataset.trackId);
+
+    if (!Number.isNaN(targetId)) {
+      setDragOverQueueTrack(targetId);
+    }
+  }}
+  onPointerUp={(event) => {
+    if (draggedQueueTrack === null) {
+      return;
+    }
+
+    const element = document.elementFromPoint(
+      event.clientX,
+      event.clientY
+    );
+
+    const queueItem = element?.closest(".queue-track");
+
+    if (queueItem) {
+      const targetId = Number(queueItem.dataset.trackId);
+
+      if (!Number.isNaN(targetId)) {
+        swapQueueTracks(
+          draggedQueueTrack,
+          targetId
+        );
+      }
+    }
+
+    setDraggedQueueTrack(null);
+    setDragOverQueueTrack(null);
+
+    try {
+      event.currentTarget.releasePointerCapture(
+        event.pointerId
+      );
+    } catch {}
+  }}
+  onPointerCancel={() => {
+    setDraggedQueueTrack(null);
+    setDragOverQueueTrack(null);
+  }}
+  data-track-id={track.id}
+>
+                <button
+                  className="queue-track-main"
+                  onClick={() =>
+                    playTrack(track, playQueue)
+                  }
+                >
+                  <div className="queue-track-cover">
+                    {track.emoji}
+                  </div>
+
+                  <div className="queue-track-info">
+                    <strong>{track.title}</strong>
+                    <span>{track.creator}</span>
+                  </div>
+                </button>
+
+                <button
+                  className="queue-remove"
+                  onClick={() =>
+                    removeFromQueue(track.id)
+                  }
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   </div>
 )}
@@ -1385,12 +2928,27 @@ const createCroppedImage = () => {
         </div>
 
         <div className="volume">
+          
           <button
   className="comments-button"
-  onClick={() => setShowComments(!showComments)}
+  onClick={() => {
+  setShowComments(true);
+  setShowQueue(false);
+}}
 >
   💬
 </button>
+
+<button
+  className={`queue-button ${showQueue ? "active" : ""}`}
+  onClick={() => {
+    setShowQueue((current) => !current);
+    setShowComments(false);
+  }}
+>
+  ☷ Queue
+</button>
+
   <button
     className="lyrics-button"
     onClick={() => setShowLyrics(!showLyrics)}
@@ -1425,7 +2983,10 @@ function TrackCard({
   onLike,
   playlists,
   onAddToPlaylist,
-}) {
+  onAddToQueue,
+})
+
+{
   return (
     <div className="music-card">
       <div className="music-cover cover-one">
@@ -1437,19 +2998,27 @@ function TrackCard({
       </div>
 
       <div className="card-info">
-        <div>
-          <h3>{track.title}</h3>
-          <p>{track.description}</p>
-        </div>
+  <div>
+    <h3>{track.title}</h3>
+    <p>{track.description}</p>
+  </div>
 
-        <button
-          className={`like-button ${isLiked ? "liked" : ""}`}
-          onClick={onLike}
-        >
-          {isLiked ? "♥" : "♡"}
-        </button>
-      </div>
+  <div className="card-actions">
+    <button
+      className="queue-add-button"
+      onClick={() => onAddToQueue(track)}
+    >
+      + Queue
+    </button>
 
+    <button
+      className={`like-button ${isLiked ? "liked" : ""}`}
+      onClick={onLike}
+    >
+      {isLiked ? "♥" : "♡"}
+    </button>
+  </div>
+</div>
       {playlists.length > 0 && (
         <select
           className="playlist-select"
@@ -1484,6 +3053,7 @@ function TrackRow({
   isLiked,
   onLike,
   onPlay,
+  onAddToQueue,
 }) {
   return (
     <div className="track-row">
@@ -1518,6 +3088,8 @@ function PlaylistPage({
   onBack,
   onPlay,
   onRemove,
+  onAddToQueue,
+
 }) {
   const playlistTracks = tracks.filter((track) =>
     playlist.tracks.includes(track.id)
@@ -1568,12 +3140,18 @@ function PlaylistPage({
               </div>
 
               <button
-                className="track-play-button"
-                onClick={() => onPlay(track)}
-              >
-                ▶
-              </button>
+  className="queue-add-button row-queue-button"
+  onClick={() => onAddToQueue(track)}
+>
+  + Queue
+</button>
 
+<button
+  className="track-play-button"
+  onClick={onPlay}
+>
+  ▶
+</button>
               <button
                 className="remove-track"
                 onClick={() =>
