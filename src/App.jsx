@@ -132,8 +132,8 @@ const [navigationHistory, setNavigationHistory] = useState([
     playlistId: null,
   },
 ]);
-const [navigationIndex, setNavigationIndex] = useState(0);
-const [isNavigatingHistory, setIsNavigatingHistory] = useState(false);
+  const [navigationIndex, setNavigationIndex] = useState(0);
+  const [isNavigatingHistory, setIsNavigatingHistory] = useState(false);
   const [currentTrack, setCurrentTrack] = useState(tracks[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playQueue, setPlayQueue] = useState(tracks);
@@ -141,7 +141,34 @@ const [isNavigatingHistory, setIsNavigatingHistory] = useState(false);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
 
+  /* sa lyrics editor */
+
+  const [showLyricsEditor, setShowLyricsEditor] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [lyricsEditorTrack, setLyricsEditorTrack] = useState(null);
+  const [editorLyrics, setEditorLyrics] = useState([]);
+  const [editorLineText, setEditorLineText] = useState("");
+  const [editorCurrentTime, setEditorCurrentTime] = useState(0);
+  const [editorActiveLyricIndex, setEditorActiveLyricIndex] =
+  useState(-1);
+  const [editingLyricIndex, setEditingLyricIndex] = useState(null);
+
+  const lyricsEditorAudioRef = useRef(null);
+
   const audioRef = useRef(null);
+
+  const lyricsContentRef = useRef(null);
+
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get("admin") !== "lyrics") {
+    return;
+  }
+
+  setShowAdminLogin(true);
+}, []);
 
   const navigateToPage = (page, playlistId = null) => {
   if (isNavigatingHistory) {
@@ -258,6 +285,11 @@ const handleRedo = () => {
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [showLyrics, setShowLyrics] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [savedLyrics, setSavedLyrics] = useState(() => {
+  const saved = localStorage.getItem("spotibai-lyrics");
+  return saved ? JSON.parse(saved) : {};
+});
+  const [activeLyricIndex, setActiveLyricIndex] = useState(-1);
   const [showQueue, setShowQueue] = useState(false);
   const [draggedQueueTrack, setDraggedQueueTrack] = useState(null);
   const [dragOverQueueTrack, setDragOverQueueTrack] = useState(null);
@@ -315,6 +347,168 @@ const [commentLikes, setCommentLikes] = useState(() => {
   return saved ? JSON.parse(saved) : {};
 });
 
+const formatEditorTime = (seconds) => {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+
+  return `${minutes}:${String(remainingSeconds).padStart(
+    2,
+    "0"
+  )}.${String(Math.floor((seconds % 1) * 100)).padStart(
+    2,
+    "0"
+  )}`;
+};
+
+  const handleAdminLogin = () => {
+  const correctPassword = "spotibai-admin";
+
+  if (adminPassword !== correctPassword) {
+    alert("Incorrect admin password.");
+    return;
+  }
+
+  setAdminPassword("");
+  setShowAdminLogin(false);
+  setShowLyricsEditor(true);
+
+  const savedLyrics = JSON.parse(
+    localStorage.getItem("spotibai-lyrics") || "{}"
+  );
+
+  const savedTrackId = Number(
+    localStorage.getItem(
+      "spotibai-lyrics-editor-track"
+    )
+  );
+
+  const selectedTrack =
+    tracks.find((track) => track.id === savedTrackId) ||
+    tracks[0];
+
+  setLyricsEditorTrack(selectedTrack);
+
+  setEditorLyrics(
+    savedLyrics[selectedTrack.id] || []
+  );
+};
+
+  const openLyricsEditor = (track) => {
+  const savedLyrics = JSON.parse(
+    localStorage.getItem("spotibai-lyrics") || "{}"
+  );
+
+  setLyricsEditorTrack(track);
+
+  setEditorLyrics(
+    savedLyrics[track.id] || []
+  );
+
+  setEditorLineText("");
+  setEditorCurrentTime(0);
+  setShowLyricsEditor(true);
+};
+
+const closeLyricsEditor = () => {
+  if (lyricsEditorAudioRef.current) {
+    lyricsEditorAudioRef.current.pause();
+  }
+
+  setShowLyricsEditor(false);
+  setLyricsEditorTrack(null);
+  setEditorLyrics([]);
+  setEditorLineText("");
+  setEditorCurrentTime(0);
+  setEditorActiveLyricIndex(-1);
+};
+
+const addSyncedLyric = () => {
+  const text = editorLineText.trim();
+
+  if (!text || !lyricsEditorAudioRef.current) {
+    return;
+  }
+
+  const currentTime =
+    lyricsEditorAudioRef.current.currentTime;
+
+  if (editingLyricIndex !== null) {
+    setEditorLyrics((current) =>
+      current
+        .map((line, index) =>
+          index === editingLyricIndex
+            ? {
+                ...line,
+                time: currentTime,
+                text,
+              }
+            : line
+        )
+        .sort((a, b) => a.time - b.time)
+    );
+
+    setEditingLyricIndex(null);
+    setEditorLineText("");
+    return;
+  }
+
+  const newLyric = {
+    time: currentTime,
+    text,
+  };
+
+  setEditorLyrics((current) =>
+    [...current, newLyric].sort(
+      (a, b) => a.time - b.time
+    )
+  );
+
+  setEditorLineText("");
+};
+
+const deleteSyncedLyric = (index) => {
+  setEditorLyrics((current) =>
+    current.filter(
+      (_, lyricIndex) => lyricIndex !== index
+    )
+  );
+};
+
+const saveEditorLyrics = () => {
+  if (!lyricsEditorTrack) {
+    return;
+  }
+
+  const savedLyrics = JSON.parse(
+    localStorage.getItem("spotibai-lyrics") || "{}"
+  );
+
+  savedLyrics[lyricsEditorTrack.id] = [...editorLyrics].sort(
+    (a, b) => a.time - b.time
+  );
+
+  localStorage.setItem(
+    "spotibai-lyrics",
+    JSON.stringify(savedLyrics)
+  );
+
+  setSavedLyrics(savedLyrics);
+
+  alert("Lyrics saved!");
+};
+
+const clearEditorLyrics = () => {
+  if (
+    !window.confirm(
+      "Are you sure you want to clear all synced lyrics for this song?"
+    )
+  ) {
+    return;
+  }
+
+  setEditorLyrics([]);
+};
+
   const playTrack = (track, queue = tracks) => {
   setPlayQueue(queue);
 
@@ -371,6 +565,31 @@ useEffect(() => {
 
   audioRef.current.volume = volume;
 }, [volume]);
+
+useEffect(() => {
+  if (
+    !showLyrics ||
+    activeLyricIndex < 0 ||
+    !lyricsContentRef.current
+  ) {
+    return;
+  }
+
+  const lyricElements =
+    lyricsContentRef.current.querySelectorAll("p");
+
+  const activeElement =
+    lyricElements[activeLyricIndex];
+
+  if (!activeElement) {
+    return;
+  }
+
+  activeElement.scrollIntoView({
+    behavior: "smooth",
+    block: "center",
+  });
+}, [activeLyricIndex, showLyrics]);
 
 useEffect(() => {
   const handleKeyDown = (event) => {
@@ -1964,6 +2183,363 @@ onAddToQueue={addToQueue}
         )}
       </main>
 
+      {/* LYRICS EDITOR */}
+
+      {showAdminLogin && (
+  <div className="admin-login-overlay">
+    <div className="admin-login-modal">
+
+      <div className="admin-login-icon">
+        🔒
+      </div>
+
+      <p className="lyrics-editor-label">
+        ADMIN ACCESS
+      </p>
+
+      <h2>Lyrics Editor</h2>
+
+      <p className="admin-login-description">
+        Enter the admin password to access the lyrics editor.
+      </p>
+
+      <input
+        type="password"
+        value={adminPassword}
+        onChange={(event) =>
+          setAdminPassword(event.target.value)
+        }
+        onKeyDown={(event) => {
+          if (event.key === "Enter") {
+            handleAdminLogin();
+          }
+        }}
+        placeholder="Admin password"
+        autoFocus
+      />
+
+      <div className="admin-login-actions">
+        <button
+          className="admin-login-cancel"
+          onClick={() => {
+            setAdminPassword("");
+            setShowAdminLogin(false);
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="admin-login-submit"
+          onClick={handleAdminLogin}
+        >
+          Login
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+      {showLyricsEditor && lyricsEditorTrack && (
+        <div className="lyrics-editor-overlay">
+          <div className="lyrics-editor">
+
+            <div className="lyrics-editor-header">
+              <div>
+                <p className="lyrics-editor-label">
+                  ADMIN
+                </p>
+
+                <h2>Lyrics Editor</h2>
+
+                <p className="lyrics-editor-song">
+                  {lyricsEditorTrack.title}
+                </p>
+
+                <span>
+                  {lyricsEditorTrack.creator}
+                </span>
+
+              <select
+  className="lyrics-editor-track-select"
+  value={lyricsEditorTrack.id}
+  onChange={(event) => {
+    const selectedTrack = tracks.find(
+      (track) => track.id === Number(event.target.value)
+    );
+
+    if (!selectedTrack) {
+      return;
+    }
+
+    const savedLyrics = JSON.parse(
+      localStorage.getItem("spotibai-lyrics") || "{}"
+    );
+
+    if (lyricsEditorAudioRef.current) {
+  lyricsEditorAudioRef.current.pause();
+  lyricsEditorAudioRef.current.currentTime = 0;
+}
+
+localStorage.setItem(
+  "spotibai-lyrics-editor-track",
+  String(selectedTrack.id)
+);
+
+setLyricsEditorTrack(selectedTrack);
+
+
+setEditorLyrics(
+  savedLyrics[selectedTrack.id] || []
+);
+
+setEditorLineText("");
+setEditorCurrentTime(0);
+setEditorActiveLyricIndex(-1);
+  }}
+>
+  {tracks.map((track) => (
+    <option key={track.id} value={track.id}>
+      {track.title}
+    </option>
+  ))}
+</select>
+
+              </div>
+
+              <button
+                className="lyrics-editor-close"
+                onClick={closeLyricsEditor}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="lyrics-editor-content">
+
+              <div className="lyrics-editor-player">
+
+                <video
+                  ref={lyricsEditorAudioRef}
+                  src={lyricsEditorTrack.media}
+                  className="lyrics-editor-video"
+                  controls
+                  onTimeUpdate={(event) => {
+  const time = event.target.currentTime;
+
+  setEditorCurrentTime(time);
+
+  let currentIndex = -1;
+
+  for (
+    let index = 0;
+    index < editorLyrics.length;
+    index++
+  ) {
+    if (time >= editorLyrics[index].time) {
+      currentIndex = index;
+    } else {
+      break;
+    }
+  }
+
+  setEditorActiveLyricIndex(currentIndex);
+}}
+                />
+
+                <div className="lyrics-editor-time">
+                  {formatEditorTime(editorCurrentTime)}
+                </div>
+
+              </div>
+
+              <div className="lyrics-editor-instructions">
+                <h3>Sync your lyrics</h3>
+
+                <p>
+                  Play the song and type the lyric line.
+                  When the lyric starts, press
+                  <strong> Add Line</strong>.
+                </p>
+              </div>
+
+              <div className="lyrics-editor-input">
+
+                <input
+                  type="text"
+                  value={editorLineText}
+                  onChange={(event) =>
+                    setEditorLineText(event.target.value)
+                  }
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addSyncedLyric();
+                    }
+                  }}
+                  placeholder="Type the lyric line..."
+                  maxLength={500}
+                />
+
+                <button
+  onClick={addSyncedLyric}
+  disabled={!editorLineText.trim()}
+>
+  {editingLyricIndex !== null
+    ? "Update Line"
+    : "Add Line"}
+</button>
+
+{editingLyricIndex !== null && (
+  <button
+    className="lyrics-editor-cancel-edit"
+    onClick={() => {
+      setEditingLyricIndex(null);
+      setEditorLineText("");
+    }}
+  >
+    Cancel
+  </button>
+)}
+
+              </div>
+
+              <div className="lyrics-editor-actions">
+
+                <button
+                  className="lyrics-editor-save"
+                  onClick={saveEditorLyrics}
+                  disabled={editorLyrics.length === 0}
+                >
+                  Save Lyrics
+                </button>
+
+                <button
+                  className="lyrics-editor-clear"
+                  onClick={clearEditorLyrics}
+                  disabled={editorLyrics.length === 0}
+                >
+                  Clear All
+                </button>
+
+              </div>
+
+              <div className="lyrics-editor-list">
+
+                {editorLyrics.length === 0 ? (
+                  <div className="lyrics-editor-empty">
+                    <div>♪</div>
+
+                    <p>
+                      No lyrics have been synced yet.
+                    </p>
+
+                    <span>
+                      Play the song and add your first line.
+                    </span>
+                  </div>
+                ) : (
+                  editorLyrics.map((line, index) => (
+                    <div
+  className={`lyrics-editor-line ${
+    index === editorActiveLyricIndex
+      ? "editor-active-lyric"
+      : ""
+  }`}
+  key={`${line.time}-${index}`}
+>
+
+<button
+  className="lyrics-editor-timestamp"
+  onClick={() => {
+    if (lyricsEditorAudioRef.current) {
+      lyricsEditorAudioRef.current.currentTime =
+        line.time;
+
+      setEditorCurrentTime(line.time);
+    }
+  }}
+>
+  {formatEditorTime(line.time)}
+</button>
+
+<div className="lyrics-editor-time-adjust">
+  <button
+    onClick={() => {
+      setEditorLyrics((current) =>
+        current
+          .map((item, lyricIndex) =>
+            lyricIndex === index
+              ? {
+                  ...item,
+                  time: Math.max(0, item.time - 0.1),
+                }
+              : item
+          )
+          .sort((a, b) => a.time - b.time)
+      );
+    }}
+  >
+    −0.1
+  </button>
+
+  <button
+    onClick={() => {
+      setEditorLyrics((current) =>
+        current
+          .map((item, lyricIndex) =>
+            lyricIndex === index
+              ? {
+                  ...item,
+                  time: item.time + 0.1,
+                }
+              : item
+          )
+          .sort((a, b) => a.time - b.time)
+      );
+    }}
+  >
+    +0.1
+  </button>
+</div>
+
+<button
+  className="lyrics-editor-line-text"
+  onClick={() => {
+    setEditingLyricIndex(index);
+    setEditorLineText(line.text);
+    setEditorCurrentTime(line.time);
+
+    if (lyricsEditorAudioRef.current) {
+      lyricsEditorAudioRef.current.currentTime =
+        line.time;
+    }
+  }}
+>
+  {line.text}
+</button>
+
+                      <button
+                        className="lyrics-editor-delete"
+                        onClick={() =>
+                          deleteSyncedLyric(index)
+                        }
+                      >
+                        ×
+                      </button>
+
+                    </div>
+                  ))
+                )}
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
+
       {showCreatePlaylist && (
         <div className="modal-overlay">
           <div className="modal">
@@ -2011,10 +2587,33 @@ onAddToQueue={addToQueue}
         ref={audioRef}
         src={currentTrack.media || ""}
         onTimeUpdate={() => {
-          if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-          }
-        }}
+  if (!audioRef.current) {
+    return;
+  }
+
+  const time = audioRef.current.currentTime;
+
+  setCurrentTime(time);
+
+  const lyrics = savedLyrics[currentTrack.id] || [];
+
+  if (lyrics.length === 0) {
+    setActiveLyricIndex(-1);
+    return;
+  }
+
+  let currentIndex = -1;
+
+  for (let index = 0; index < lyrics.length; index++) {
+    if (time >= lyrics[index].time) {
+      currentIndex = index;
+    } else {
+      break;
+    }
+  }
+
+  setActiveLyricIndex(currentIndex);
+}}
         onLoadedMetadata={() => {
           if (audioRef.current) {
             setDuration(audioRef.current.duration);
@@ -2051,28 +2650,55 @@ onAddToQueue={addToQueue}
 
 {showLyrics && (
   <div className="lyrics-panel">
-    <div className="lyrics-header">
-      <div>
-        <p className="eyebrow">LYRICS</p>
-        <h2>{currentTrack.title}</h2>
+    <div className="lyrics-window">
+
+      <div className="lyrics-header">
+        <div>
+          <p className="eyebrow">LYRICS</p>
+          <h2>{currentTrack.title}</h2>
+        </div>
+
+        <button
+          className="lyrics-close"
+          onClick={() => setShowLyrics(false)}
+          aria-label="Close lyrics"
+        >
+          ×
+        </button>
       </div>
 
-      <button
-        className="lyrics-close"
-        onClick={() => setShowLyrics(false)}
+      <div
+        className="lyrics-content"
+        ref={lyricsContentRef}
       >
-        ×
-      </button>
-    </div>
+        {savedLyrics[currentTrack.id]?.length > 0 ? (
+          savedLyrics[currentTrack.id].map((line, index) => (
+            <p
+              key={`${line.time}-${index}`}
+              className={
+                index === activeLyricIndex
+                  ? "active-lyric"
+                  : index < activeLyricIndex
+                  ? "past-lyric"
+                  : ""
+              }
+              onClick={() => {
+                if (!audioRef.current) {
+                  return;
+                }
 
-    <div className="lyrics-content">
-      {currentTrack.lyrics ? (
-        currentTrack.lyrics.map((line, index) => (
-          <p key={index}>{line || "\u00A0"}</p>
-        ))
-      ) : (
-        <p>No lyrics available.</p>
-      )}
+                audioRef.current.currentTime = line.time;
+                setCurrentTime(line.time);
+              }}
+            >
+              {line.text}
+            </p>
+          ))
+        ) : (
+          <p>No synced lyrics available.</p>
+        )}
+      </div>
+
     </div>
   </div>
 )}
