@@ -8,23 +8,22 @@ const featuredArtist = {
   image: "🎵",
 };
 
+
 const tracks = [
-{
-  id: 1,
-  title: "Lucky Rap",
-  creator: "Spotibai",
-  description: "MABANGIS",
-  duration: "0:42",
-  emoji: "🎵",
-  media: "/media/lucky-rap.mp4",
-  lyrics: [
-    "Lucky Rap",
-    "",
-    "Subok lang tayo yah, hindi toh pull ah ",
-    "Line 2 of the lyrics",
-    "Line 3 of the lyrics"
-  ]
-},  {
+  {
+    id: 1,
+    title: "Lucky Rap",
+    creator: "Bai",
+    description: "MABANGIS",
+    duration: "0:42",
+    emoji: "🎵",
+    media: "/media/lucky-rap.mp4",
+    artwork: "/artwork/songs/lucky-rap.jpg",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
+  },
+  {
     id: 2,
     title: "Hinarot",
     creator: "EYY",
@@ -32,29 +31,23 @@ const tracks = [
     duration: "0:28",
     emoji: "😂",
     media: "/media/hinarot-pusong-malambot.mp4",
-  lyrics: [
-    "Hinarot",
-    "",
-    "Subok lang tayo yah, hindi toh pull ah ",
-    "Line 2 of the lyrics",
-    "Line 3 of the lyrics"
-  ]
+    artwork: "/artwork/songs/hinarot.jpg",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
   },
   {
     id: 3,
     title: "Chocolate",
-    creator: "The 1975 - Jake Cuenca, Joseph Marco, and Enrique Gil ",
+    creator: "The 1975 - Jake Cuenca, Joseph Marco, and Enrique Gil",
     description: "We got the 1975 at home",
     duration: "0:35",
     emoji: "🎤",
     media: "/media/1975-jake-cuenca.mp4",
-  lyrics: [
-    "Chocolate",
-    "",
-    "Subok lang tayo yah, hindi toh pull ah ",
-    "Line 2 of the lyrics",
-    "Line 3 of the lyrics"
-  ]
+    artwork: "/artwork/songs/chocolate.jpg",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
   },
   {
     id: 4,
@@ -64,63 +57,471 @@ const tracks = [
     duration: "0:51",
     emoji: "🔊",
     media: "/media/wait-a-minute.mp4",
-  lyrics: [
-    "Wait A Minute",
-    "",
-    "Subok lang tayo yah, hindi toh pull ah ",
-    "Line 2 of the lyrics",
-    "Line 3 of the lyrics"
-  ]
+    artwork: "/artwork/songs/wait-a-minute.jpg",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
+  },
+  {
+    id: 5,
+    title: "Beat It",
+    creator: "Bai",
+    description: "Bai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/bai beat it.mp3",
+    artwork: "",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
+  },
+  {
+    id: 6,
+    title: "Dyosa",
+    creator: "Bai",
+    description: "Bai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/bai dyosa.mp3",
+    artwork: "",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
+  },
+  {
+    id: 7,
+    title: "Michael",
+    creator: "Bai",
+    description: "Bai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/bai michael.mp3",
+    artwork: "",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
+  },
+  {
+    id: 8,
+    title: "Sisi",
+    creator: "Bai",
+    description: "Bai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/bai sisi.mp3",
+    artwork: "",
+    albumId: 1,
+    artistId: 2,
+    lyrics: [],
+  },
+  {
+    id: 9,
+    title: "Mahirap Na",
+    creator: "Flowj",
+    description: "Flowj",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/flowj mahirap na.mp3",
+    artwork: "",
+    albumId: 6,
+    artistId: null,
+    lyrics: [],
+  },
+  {
+    id: 10,
+    title: "Byahe",
+    creator: "Garcia-J",
+    description: "Garcia-J",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/garcia byahe.mp3",
+    artwork: "",
+    albumId: 2,
+    artistId: 3,
+    lyrics: [],
+  },
+  {
+    id: 11,
+    title: "Driftstar",
+    creator: "Garcia-J",
+    description: "Garcia-J",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/garcia driftstar.mp3",
+    artwork: "",
+    albumId: 2,
+    artistId: 3,
+    lyrics: [],
+  },
+  {
+    id: 12,
+    title: "Dyosa",
+    creator: "Garcia-J",
+    description: "Garcia-J",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/garcia dyosa.mp3",
+    artwork: "",
+    albumId: 2,
+    artistId: 3,
+    lyrics: [],
+  },
+  {
+    id: 13,
+    title: "Malambing",
+    creator: "Garcia-J",
+    description: "Garcia-J",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/garcia malambing.mp3",
+    artwork: "",
+    albumId: 2,
+    artistId: 3,
+    lyrics: [],
+  },
+  {
+    id: 14,
+    title: "Sins",
+    creator: "Garcia-J",
+    description: "Garcia-J",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/garcia sins.mp3",
+    artwork: "",
+    albumId: 2,
+    artistId: 3,
+    lyrics: [],
+  },
+  {
+    id: 15,
+    title: "Hinarot",
+    creator: "Goo Goo Bai",
+    description: "Goo Goo Bai",
+    duration: "0:00",
+    emoji: "😎",
+    media: "/media/googoo hinarot.mp3",
+    artwork: "",
+    albumId: 6,
+    artistId: 5,
+    lyrics: [],
+  },
+  {
+    id: 16,
+    title: "Hari ng Drill",
+    creator: "Jnick Malakaskasto",
+    description: "Jnick Malakaskasto",
+    duration: "0:00",
+    emoji: "🎧",
+    media: "/media/jnick hari ng drill.mp3",
+    artwork: "",
+    albumId: 6,
+    artistId: 6,
+    lyrics: [],
+  },
+  {
+    id: 17,
+    title: "Mala",
+    creator: "Jnick Malakaskasto",
+    description: "Jnick Malakaskasto",
+    duration: "0:00",
+    emoji: "🎧",
+    media: "/media/jnick mala.mp3",
+    artwork: "",
+    albumId: 6,
+    artistId: 6,
+    lyrics: [],
+  },
+  {
+    id: 18,
+    title: "Fall",
+    creator: "Jupeta",
+    description: "Jupeta",
+    duration: "0:00",
+    emoji: "⭐",
+    media: "/media/jupeta fall.mp3",
+    artwork: "",
+    albumId: 5,
+    artistId: 8,
+    lyrics: [],
+  },
+  {
+    id: 19,
+    title: "Fearless",
+    creator: "Jupeta",
+    description: "Jupeta",
+    duration: "0:00",
+    emoji: "⭐",
+    media: "/media/jupeta fearless.mp3",
+    artwork: "",
+    albumId: 5,
+    artistId: 8,
+    lyrics: [],
+  },
+  {
+    id: 20,
+    title: "Tanga",
+    creator: "Jupeta",
+    description: "Jupeta",
+    duration: "0:00",
+    emoji: "⭐",
+    media: "/media/jupeta tanga.mp3",
+    artwork: "",
+    albumId: 5,
+    artistId: 8,
+    lyrics: [],
+  },
+  {
+    id: 21,
+    title: "Understand",
+    creator: "Jupeta",
+    description: "Jupeta",
+    duration: "0:00",
+    emoji: "⭐",
+    media: "/media/jupeta understand.mp3",
+    artwork: "",
+    albumId: 5,
+    artistId: 8,
+    lyrics: [],
+  },
+  {
+    id: 22,
+    title: "Otin",
+    creator: "ReneBai",
+    description: "ReneBai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/rene jay otin.mp3",
+    artwork: "",
+    albumId: 3,
+    artistId: 1,
+    lyrics: [],
+  },
+  {
+    id: 23,
+    title: "Bruises",
+    creator: "ReneBai",
+    description: "ReneBai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/renejay bruises.mp3",
+    artwork: "",
+    albumId: 3,
+    artistId: 1,
+    lyrics: [],
+  },
+  {
+    id: 24,
+    title: "Chosen",
+    creator: "ReneBai",
+    description: "ReneBai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/renejay chosen.mp3",
+    artwork: "",
+    albumId: 3,
+    artistId: 1,
+    lyrics: [],
+  },
+  {
+    id: 25,
+    title: "Ipagpatawad",
+    creator: "ReneBai",
+    description: "ReneBai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/renejay ipagpatawad.mp3",
+    artwork: "",
+    albumId: 3,
+    artistId: 1,
+    lyrics: [],
+  },
+  {
+    id: 26,
+    title: "Peaches",
+    creator: "ReneBai",
+    description: "ReneBai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/renejay peaches.mp3",
+    artwork: "",
+    albumId: 3,
+    artistId: 1,
+    lyrics: [],
+  },
+  {
+    id: 27,
+    title: "Rain",
+    creator: "ReneBai",
+    description: "ReneBai",
+    duration: "0:00",
+    emoji: "🎵",
+    media: "/media/renejay rain.mp3",
+    artwork: "",
+    albumId: 3,
+    artistId: 1,
+    lyrics: [],
+  },
+  {
+    id: 28,
+    title: "Ikaw",
+    creator: "Lil Uzi Bai",
+    description: "Lil Uzi Bai",
+    duration: "0:00",
+    emoji: "🔥",
+    media: "/media/uzi ikaw.mp3",
+    artwork: "",
+    albumId: 6,
+    artistId: 4,
+    lyrics: [],
+  },
+  {
+    id: 29,
+    title: "Heartbreak",
+    creator: "Vic Dasukatan",
+    description: "Vic Dasukatan",
+    duration: "0:00",
+    emoji: "🌎",
+    media: "/media/vic heartbreak.mp3",
+    artwork: "",
+    albumId: 4,
+    artistId: 9,
+    lyrics: [],
+  },
+  {
+    id: 30,
+    title: "Reason",
+    creator: "Vic Dasukatan",
+    description: "Vic Dasukatan",
+    duration: "0:00",
+    emoji: "🌎",
+    media: "/media/vic reason.mp3",
+    artwork: "",
+    albumId: 4,
+    artistId: 9,
+    lyrics: [],
   },
 ];
 
 const artists = [
   {
     id: 1,
-    name: "Spotibai",
+    name: "ReneBai",
     description:
-      "The home of funny, memorable, and unexpected music from the Spotibai community.",
-    image: "🎵",
+      "An artist bringing memorable and unexpected sounds to Spotibai.",
+    image: "artwork/artists/reneja.jpg",
   },
   {
     id: 2,
-    name: "EYY",
+    name: "Bai",
     description:
-      "Funny and unexpected sounds from the Spotibai community.",
-    image: "😂",
+      "A versatile artist with a collection of unforgettable songs.",
+    image: "artwork/artists/baii.png",
   },
   {
     id: 3,
-    name: "The 1975 - Jake Cuenca, Joseph Marco, and Enrique Gil",
+    name: "Garcia-J",
     description:
-      "The 1975 at home. Featuring unforgettable Filipino meme performances.",
-    image: "🎤",
+      "Sharing stories, experiences, and memorable sounds through music.",
+    image: "artwork/artists/garcia-j.png",
   },
   {
     id: 4,
-    name: "Bai",
+    name: "Lil Uzi Bai",
     description:
-      "Memorable sounds and songs from Bai.",
-    image: "🔊",
+      "Bringing unexpected sounds and energy to Spotibai.",
+    image: "artwork/artists/liluzi.png",
+  },
+  {
+    id: 5,
+    name: "Goo Goo Bai",
+    description:
+      "Funny and memorable sounds from the Spotibai community.",
+    image: "artwork/artists/googoobai.png",
+  },
+  {
+    id: 6,
+    name: "Jnick Malakaskasto",
+    description:
+      "A Spotibai artist with unforgettable sounds.",
+    image: "artwork/artists/jnick.jpg",
+  },
+  {
+    id: 7,
+    name: "Lucky",
+    description:
+      "Making memorable sounds and songs for Spotibai.",
+    image: "artwork/artists/lucky1.png",
+  },
+  {
+    id: 8,
+    name: "Mami Jupeta",
+    description:
+      "Bringing personality and variety to the Spotibai music library.",
+    image: "artwork/artists/mami jupeta.jpg",
+  },
+  {
+    id: 9,
+    name: "Vic Dasukatan",
+    description:
+      "Creating memorable sounds for the Spotibai community.",
+    image: "artwork/artists/vic.jpg",
   },
 ];
 
 const albums = [
   {
     id: 1,
-    title: "Spotibai Originals",
-    artist: "Spotibai",
-    description: "Funny, memorable, and unexpected music.",
-    image: "🎵",
-    tracks: [1],
+    title: "Certified Lover Bai",
+    artist: "Bai",
+    description:
+      "Showcasing the versatility of Bai through a variety of songs.",
+    image: "/artwork/albums/certified lover.jpg",
+    tracks: [],
   },
   {
     id: 2,
-    title: "Spotibai Memes",
-    artist: "Spotibai",
-    description: "A collection of unforgettable meme songs.",
-    image: "😂",
-    tracks: [2, 3, 4],
+    title: "The Life of Garcia-J",
+    artist: "Garcia-J",
+    description:
+      "Life of Garcia-J focuses on Garcia-J's struggle and upbringing.",
+    image: "/artwork/albums/The_life_of_pablo_alternate.jpg",
+    tracks: [],
+  },
+  {
+    id: 3,
+    title: "𝘉𝘈𝘐.",
+    artist: "ReneBai",
+    description:
+      "A collection of sounds and stories from ReneBai.",
+    image: "/artwork/albums/renebai.png",
+    tracks: [],
+  },
+  {
+    id: 4,
+    title: "Bai World: The Sideline Story",
+    artist: "Vic Dasukatan",
+    description:
+      "The story continues from the sidelines through unforgettable sounds.",
+    image: "/artwork/albums/colealbum.png",
+    tracks: [],
+  },
+  {
+    id: 5,
+    title: "Bailess",
+    artist: "Mami Jupeta",
+    description:
+      "A collection of memorable songs from Mami Jupeta.",
+    image: "/artwork/albums/fearless.png",
+    tracks: [],
+  },
+  {
+    id: 6,
+    title: "Rising Stars",
+    artist: "random",
+    description:
+      "A collection of songs from rising and unexpected artists.",
+    image: "/artwork/albums/RisingStarLogo.jpeg",
+    tracks: [],
   },
 ];
 
@@ -151,6 +552,11 @@ const [navigationHistory, setNavigationHistory] = useState([
   const [lyricsEditorTrack, setLyricsEditorTrack] = useState(null);
   const [editorLyrics, setEditorLyrics] = useState([]);
   const [editorLineText, setEditorLineText] = useState("");
+  const [editorArtwork, setEditorArtwork] = useState("");
+  const [editorAlbumArtwork, setEditorAlbumArtwork] = useState("");
+  const [editorArtistArtwork, setEditorArtistArtwork] = useState("");
+  const [editorAlbumId, setEditorAlbumId] = useState("");
+  const [editorArtistId, setEditorArtistId] = useState("");
   const [editorCurrentTime, setEditorCurrentTime] = useState(0);
   const [editorActiveLyricIndex, setEditorActiveLyricIndex] =
   useState(-1);
@@ -404,10 +810,61 @@ const formatEditorTime = (seconds) => {
     localStorage.getItem("spotibai-lyrics") || "{}"
   );
 
+  const savedArtwork = JSON.parse(
+    localStorage.getItem("spotibai-artwork") || "{}"
+  );
+
+  const savedAlbumArtwork = JSON.parse(
+    localStorage.getItem("spotibai-album-artwork") || "{}"
+  );
+
+  const savedArtistArtwork = JSON.parse(
+    localStorage.getItem("spotibai-artist-artwork") || "{}"
+  );
+
+  const savedTrackAssignments = JSON.parse(
+    localStorage.getItem("spotibai-track-assignments") || "{}"
+  );
+
+  const savedTrackAssignment =
+    savedTrackAssignments[track.id] || {};
+
   setLyricsEditorTrack(track);
 
   setEditorLyrics(
     savedLyrics[track.id] || []
+  );
+
+  setEditorArtwork(
+    savedArtwork[track.id] || track.image || ""
+  );
+
+  setEditorAlbumId(
+    savedTrackAssignment.albumId
+      ? String(savedTrackAssignment.albumId)
+      : track.albumId
+        ? String(track.albumId)
+        : ""
+  );
+
+  setEditorArtistId(
+    savedTrackAssignment.artistId
+      ? String(savedTrackAssignment.artistId)
+      : track.artistId
+        ? String(track.artistId)
+        : ""
+  );
+
+  setEditorAlbumArtwork(
+    savedAlbumArtwork[
+      savedTrackAssignment.albumId || track.albumId
+    ] || ""
+  );
+
+  setEditorArtistArtwork(
+    savedArtistArtwork[
+      savedTrackAssignment.artistId || track.artistId
+    ] || ""
   );
 
   setEditorLineText("");
@@ -480,6 +937,25 @@ const deleteSyncedLyric = (index) => {
   );
 };
 
+const clearEditorLyrics = () => {
+  if (!lyricsEditorTrack) {
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "Clear all synced lyrics for this song?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setEditorLyrics([]);
+  setEditingLyricIndex(null);
+  setEditorLineText("");
+  setEditorActiveLyricIndex(-1);
+};
+
 const saveEditorLyrics = () => {
   if (!lyricsEditorTrack) {
     return;
@@ -489,30 +965,75 @@ const saveEditorLyrics = () => {
     localStorage.getItem("spotibai-lyrics") || "{}"
   );
 
-  savedLyrics[lyricsEditorTrack.id] = [...editorLyrics].sort(
-    (a, b) => a.time - b.time
-  );
+  savedLyrics[lyricsEditorTrack.id] = editorLyrics;
 
   localStorage.setItem(
     "spotibai-lyrics",
     JSON.stringify(savedLyrics)
   );
 
-  setSavedLyrics(savedLyrics);
+  const savedArtwork = JSON.parse(
+    localStorage.getItem("spotibai-artwork") || "{}"
+  );
 
-  alert("Lyrics saved!");
-};
-
-const clearEditorLyrics = () => {
-  if (
-    !window.confirm(
-      "Are you sure you want to clear all synced lyrics for this song?"
-    )
-  ) {
-    return;
+  if (editorArtwork) {
+    savedArtwork[lyricsEditorTrack.id] = editorArtwork;
+  } else {
+    delete savedArtwork[lyricsEditorTrack.id];
   }
 
-  setEditorLyrics([]);
+  localStorage.setItem(
+    "spotibai-artwork",
+    JSON.stringify(savedArtwork)
+  );
+
+  const savedAlbumArtwork = JSON.parse(
+    localStorage.getItem("spotibai-album-artwork") || "{}"
+  );
+
+  if (editorAlbumArtwork && editorAlbumId) {
+    savedAlbumArtwork[Number(editorAlbumId)] =
+      editorAlbumArtwork;
+  }
+
+  localStorage.setItem(
+    "spotibai-album-artwork",
+    JSON.stringify(savedAlbumArtwork)
+  );
+
+  const savedArtistArtwork = JSON.parse(
+    localStorage.getItem("spotibai-artist-artwork") || "{}"
+  );
+
+  if (editorArtistArtwork && editorArtistId) {
+    savedArtistArtwork[Number(editorArtistId)] =
+      editorArtistArtwork;
+  }
+
+  localStorage.setItem(
+    "spotibai-artist-artwork",
+    JSON.stringify(savedArtistArtwork)
+  );
+
+  const savedTrackAssignments = JSON.parse(
+  localStorage.getItem("spotibai-track-assignments") || "{}"
+);
+
+savedTrackAssignments[lyricsEditorTrack.id] = {
+  albumId: editorAlbumId
+    ? Number(editorAlbumId)
+    : null,
+  artistId: editorArtistId
+    ? Number(editorArtistId)
+    : null,
+};
+
+localStorage.setItem(
+  "spotibai-track-assignments",
+  JSON.stringify(savedTrackAssignments)
+);
+
+  alert("Lyrics, artwork, album, and artist saved!");
 };
 
   const playTrack = (track, queue = tracks) => {
@@ -1195,6 +1716,21 @@ const filteredTracks = tracks.filter((track) => {
   );
 });
 
+
+const savedTrackAssignments = JSON.parse(
+  localStorage.getItem("spotibai-track-assignments") || "{}"
+);
+
+const assignedTracks = tracks.map((track) => {
+  const assignment = savedTrackAssignments[track.id] || {};
+
+  return {
+    ...track,
+    assignedAlbumId: assignment.albumId || null,
+    assignedArtistId: assignment.artistId || null,
+  };
+});
+
 const filteredArtists = artists.filter((artist) => {
   if (!normalizedSearch) {
     return true;
@@ -1553,7 +2089,7 @@ const searchResults =
       </div>
 
       <div className="music-grid">
-        {tracks.map((track) => (
+        {tracks.slice(-4).reverse().map((track) => (
           <TrackCard
             key={track.id}
             track={track}
@@ -1577,7 +2113,7 @@ const searchResults =
       </div>
 
       <div className="track-list home-track-list">
-        {tracks.map((track, index) => (
+        {tracks.slice(0, 8).map((track, index) => (
           <TrackRow
             key={track.id}
             track={track}
@@ -1775,9 +2311,16 @@ const searchResults =
   navigateToPage("artist");
 }}
                 >
-                  <div className="search-artist-image">
-                    {artist.image}
-                  </div>
+                 <div className="search-artist-image">
+  {getArtistArtwork(artist) ? (
+    <img
+      src={getArtistArtwork(artist)}
+      alt={artist.name}
+    />
+  ) : (
+    artist.image
+  )}
+</div>
 
                   <div className="search-artist-info">
                     <h3>{artist.name}</h3>
@@ -1807,8 +2350,15 @@ const searchResults =
   }}
 >
   <div className="search-album-image">
-    {album.image}
-  </div>
+  {getAlbumArtwork(album) ? (
+    <img
+      src={getAlbumArtwork(album)}
+      alt={album.title}
+    />
+  ) : (
+    album.image
+  )}
+</div>
 
   <div className="search-album-info">
     <h3>{album.title}</h3>
@@ -1845,9 +2395,15 @@ const searchResults =
 }}
                     >
                       <div className="search-artist-image">
-                        {artist.image}
-                      </div>
-
+  {getArtistArtwork(artist) ? (
+    <img
+      src={getArtistArtwork(artist)}
+      alt={artist.name}
+    />
+  ) : (
+    artist.image
+  )}
+</div>
                       <div className="search-artist-info">
                         <h3>{artist.name}</h3>
                         <p>Artist</p>
@@ -1907,8 +2463,15 @@ const searchResults =
   }}
 >
   <div className="search-album-image">
-    {album.image}
-  </div>
+  {getAlbumArtwork(album) ? (
+    <img
+      src={getAlbumArtwork(album)}
+      alt={album.title}
+    />
+  ) : (
+    album.image
+  )}
+</div>
 
   <div className="search-album-info">
     <h3>{album.title}</h3>
@@ -1994,8 +2557,15 @@ const searchResults =
 }}
                   >
                     <div className="search-artist-image">
-                      {artist.image}
-                    </div>
+  {getArtistArtwork(artist) ? (
+    <img
+      src={getArtistArtwork(artist)}
+      alt={artist.name}
+    />
+  ) : (
+    artist.image
+  )}
+</div>
 
                     <div className="search-artist-info">
                       <h3>{artist.name}</h3>
@@ -2040,8 +2610,15 @@ const searchResults =
   }}
 >
   <div className="search-album-image">
-    {album.image}
-  </div>
+  {getAlbumArtwork(album) ? (
+    <img
+      src={getAlbumArtwork(album)}
+      alt={album.title}
+    />
+  ) : (
+    album.image
+  )}
+</div>
 
   <div className="search-album-info">
     <h3>{album.title}</h3>
@@ -2072,7 +2649,14 @@ const searchResults =
 
     <div className="artist-profile-header">
       <div className="artist-profile-image">
-        {selectedArtist.image}
+        {getArtistArtwork(selectedArtist) ? (
+          <img
+            src={getArtistArtwork(selectedArtist)}
+            alt={selectedArtist.name}
+          />
+        ) : (
+          selectedArtist.image
+        )}
       </div>
 
       <div className="artist-profile-info">
@@ -2090,13 +2674,12 @@ const searchResults =
       </div>
 
       <div className="track-list">
-        {tracks
-          .filter(
-            (track) =>
-              track.creator.toLowerCase() ===
-              selectedArtist.name.toLowerCase()
-          )
-          .map((track, index) => (
+        {assignedTracks
+  .filter(
+    (track) =>
+      track.assignedArtistId === selectedArtist.id
+  )
+  .map((track, index) => (
             <TrackRow
               key={track.id}
               track={track}
@@ -2128,8 +2711,15 @@ const searchResults =
 
     <div className="album-profile-header">
       <div className="album-profile-image">
-        {selectedAlbum.image}
-      </div>
+  {getAlbumArtwork(selectedAlbum) ? (
+    <img
+      src={getAlbumArtwork(selectedAlbum)}
+      alt={selectedAlbum.title}
+    />
+  ) : (
+    selectedAlbum.image
+  )}
+</div>
 
       <div className="album-profile-info">
         <p className="eyebrow">ALBUM</p>
@@ -2137,15 +2727,44 @@ const searchResults =
         <h1>{selectedAlbum.title}</h1>
 
         <p className="album-artist-name">
-          {selectedAlbum.artist}
-        </p>
+  {(() => {
+    const albumTracks = assignedTracks.filter(
+      (track) =>
+        track.assignedAlbumId === selectedAlbum.id
+    );
 
-        <p>{selectedAlbum.description}</p>
+    const artistIds = [
+      ...new Set(
+        albumTracks
+          .map((track) => track.assignedArtistId)
+          .filter(Boolean)
+      ),
+    ];
 
-        <p className="album-track-count">
-          {selectedAlbum.tracks.length}{" "}
-          {selectedAlbum.tracks.length === 1 ? "song" : "songs"}
-        </p>
+    const albumArtists = artists.filter((artist) =>
+      artistIds.includes(artist.id)
+    );
+
+    return albumArtists.length > 0
+      ? albumArtists.map((artist) => artist.name).join(", ")
+      : selectedAlbum.artist;
+  })()}
+</p>
+
+<p>{selectedAlbum.description}</p>
+
+<p className="album-track-count">
+  {assignedTracks.filter(
+    (track) =>
+      track.assignedAlbumId === selectedAlbum.id
+  ).length}{" "}
+  {assignedTracks.filter(
+    (track) =>
+      track.assignedAlbumId === selectedAlbum.id
+  ).length === 1
+    ? "song"
+    : "songs"}
+</p>
       </div>
     </div>
 
@@ -2154,35 +2773,35 @@ const searchResults =
         <h2>Songs</h2>
       </div>
 
-      <div className="track-list">
-        {selectedAlbum.tracks
-          .map((trackId) =>
-            tracks.find((track) => track.id === trackId)
+   <div className="track-list">
+  {assignedTracks
+    .filter(
+      (track) =>
+        track.assignedAlbumId === selectedAlbum.id
+    )
+    .map((track, index) => (
+      <TrackRow
+        key={track.id}
+        track={track}
+        index={index}
+        currentTrack={currentTrack}
+        isPlaying={isPlaying}
+        isLiked={likedTracks.includes(track.id)}
+        onLike={() => toggleLike(track.id)}
+        onAddToQueue={addToQueue}
+        onPlay={() =>
+          playTrack(
+            track,
+            assignedTracks.filter(
+              (queueTrack) =>
+                queueTrack.assignedAlbumId ===
+                selectedAlbum.id
+            )
           )
-          .filter(Boolean)
-          .map((track, index) => (
-            <TrackRow
-              key={track.id}
-              track={track}
-              index={index}
-              currentTrack={currentTrack}
-              isPlaying={isPlaying}
-              isLiked={likedTracks.includes(track.id)}
-              onLike={() => toggleLike(track.id)}
-              onAddToQueue={addToQueue}
-              onPlay={() =>
-                playTrack(
-                  track,
-                  selectedAlbum.tracks
-                    .map((trackId) =>
-                      tracks.find((track) => track.id === trackId)
-                    )
-                    .filter(Boolean)
-                )
-              }
-            />
-          ))}
-      </div>
+        }
+      />
+    ))}
+</div>
     </section>
   </section>
 )}
@@ -2419,9 +3038,13 @@ onAddToQueue={addToQueue}
       return;
     }
 
-    const savedLyrics = JSON.parse(
-      localStorage.getItem("spotibai-lyrics") || "{}"
-    );
+     const savedLyrics = JSON.parse(
+    localStorage.getItem("spotibai-lyrics") || "{}"
+  );
+
+  const savedArtwork = JSON.parse(
+    localStorage.getItem("spotibai-artwork") || "{}"
+  );
 
     if (lyricsEditorAudioRef.current) {
   lyricsEditorAudioRef.current.pause();
@@ -2438,6 +3061,12 @@ setLyricsEditorTrack(selectedTrack);
 
 setEditorLyrics(
   savedLyrics[selectedTrack.id] || []
+);
+
+setEditorArtwork(
+  savedArtwork[selectedTrack.id] ||
+    selectedTrack.image ||
+    ""
 );
 
 setEditorLineText("");
@@ -2509,6 +3138,236 @@ setEditorActiveLyricIndex(-1);
                   <strong> Add Line</strong>.
                 </p>
               </div>
+
+              <div className="lyrics-editor-assignment">
+  <div className="lyrics-editor-assignment-field">
+    <label htmlFor="editor-album">
+      Album
+    </label>
+
+    <select
+      id="editor-album"
+      value={editorAlbumId}
+      onChange={(event) => {
+        setEditorAlbumId(event.target.value);
+      }}
+    >
+      <option value="">
+        No album
+      </option>
+
+      {albums.map((album) => (
+        <option
+          key={album.id}
+          value={album.id}
+        >
+          {album.title}
+        </option>
+      ))}
+    </select>
+  </div>
+
+  <div className="lyrics-editor-assignment-field">
+    <label htmlFor="editor-artist">
+      Artist
+    </label>
+
+    <select
+      id="editor-artist"
+      value={editorArtistId}
+      onChange={(event) => {
+        setEditorArtistId(event.target.value);
+      }}
+    >
+      <option value="">
+        No artist
+      </option>
+
+      {artists.map((artist) => (
+        <option
+          key={artist.id}
+          value={artist.id}
+        >
+          {artist.name}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
+              <div className="lyrics-editor-artwork">
+  <div className="lyrics-editor-artwork-header">
+    <h3>Song Artwork</h3>
+
+    <p>
+      Add a picture for this song.
+    </p>
+  </div>
+
+  <div className="lyrics-editor-artwork-content">
+    <div className="lyrics-editor-artwork-preview">
+      {editorArtwork ? (
+        <img
+          src={editorArtwork}
+          alt={lyricsEditorTrack.title}
+        />
+      ) : (
+        <span>{lyricsEditorTrack.emoji}</span>
+      )}
+    </div>
+
+    <div className="lyrics-editor-artwork-actions">
+      <label className="lyrics-editor-upload">
+        Upload Artwork
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+
+            if (!file) {
+              return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+              setEditorArtwork(reader.result);
+            };
+
+            reader.readAsDataURL(file);
+          }}
+        />
+      </label>
+
+      {editorArtwork && (
+        <button
+          className="lyrics-editor-remove-artwork"
+          onClick={() => setEditorArtwork("")}
+        >
+          Remove Artwork
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
+<div className="lyrics-editor-artwork">
+  <div className="lyrics-editor-artwork-header">
+    <h3>Album Artwork</h3>
+
+    <p>
+      Add a picture for this song's album.
+    </p>
+  </div>
+
+  <div className="lyrics-editor-artwork-content">
+    <div className="lyrics-editor-artwork-preview">
+      {editorAlbumArtwork ? (
+        <img
+          src={editorAlbumArtwork}
+          alt="Album artwork"
+        />
+      ) : (
+        <span>💿</span>
+      )}
+    </div>
+
+    <div className="lyrics-editor-artwork-actions">
+      <label className="lyrics-editor-upload">
+        Upload Artwork
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+
+            if (!file) {
+              return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+              setEditorAlbumArtwork(reader.result);
+            };
+
+            reader.readAsDataURL(file);
+          }}
+        />
+      </label>
+
+      {editorAlbumArtwork && (
+        <button
+          className="lyrics-editor-remove-artwork"
+          onClick={() => setEditorAlbumArtwork("")}
+        >
+          Remove Artwork
+        </button>
+      )}
+    </div>
+  </div>
+</div>
+
+<div className="lyrics-editor-artwork">
+  <div className="lyrics-editor-artwork-header">
+    <h3>Artist Artwork</h3>
+
+    <p>
+      Add a picture for this song's artist.
+    </p>
+  </div>
+
+  <div className="lyrics-editor-artwork-content">
+    <div className="lyrics-editor-artwork-preview">
+      {editorArtistArtwork ? (
+        <img
+          src={editorArtistArtwork}
+          alt="Artist artwork"
+        />
+      ) : (
+        <span>👤</span>
+      )}
+    </div>
+
+    <div className="lyrics-editor-artwork-actions">
+      <label className="lyrics-editor-upload">
+        Upload Artwork
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+
+            if (!file) {
+              return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+              setEditorArtistArtwork(reader.result);
+            };
+
+            reader.readAsDataURL(file);
+          }}
+        />
+      </label>
+
+      {editorArtistArtwork && (
+        <button
+          className="lyrics-editor-remove-artwork"
+          onClick={() => setEditorArtistArtwork("")}
+        >
+          Remove Artwork
+        </button>
+      )}
+    </div>
+  </div>
+</div>
 
               <div className="lyrics-editor-input">
 
@@ -3758,6 +4617,18 @@ setEditorActiveLyricIndex(-1);
   );
 }
 
+const getTrackArtwork = (track) => {
+  return track.artwork || "";
+};
+
+const getAlbumArtwork = (album) => {
+  return album.image || "";
+};
+
+const getArtistArtwork = (artist) => {
+  return artist.image || "";
+};
+
 function TrackCard({
   track,
   isLiked,
@@ -3766,13 +4637,18 @@ function TrackCard({
   playlists,
   onAddToPlaylist,
   onAddToQueue,
-})
-
-{
+}) {
   return (
     <div className="music-card">
       <div className="music-cover cover-one">
-        <span>{track.emoji}</span>
+        {getTrackArtwork(track) ? (
+          <img
+            src={getTrackArtwork(track)}
+            alt={track.title}
+          />
+        ) : (
+          <span>{track.emoji}</span>
+        )}
 
         <button className="card-play-button" onClick={onPlay}>
           ▶
@@ -3780,27 +4656,28 @@ function TrackCard({
       </div>
 
       <div className="card-info">
-  <div>
-    <h3>{track.title}</h3>
-    <p>{track.description}</p>
-  </div>
+        <div>
+          <h3>{track.title}</h3>
+          <p>{track.description}</p>
+        </div>
 
-  <div className="card-actions">
-    <button
-      className="queue-add-button"
-      onClick={() => onAddToQueue(track)}
-    >
-      + Queue
-    </button>
+        <div className="card-actions">
+          <button
+            className="queue-add-button"
+            onClick={() => onAddToQueue(track)}
+          >
+            + Queue
+          </button>
 
-    <button
-      className={`like-button ${isLiked ? "liked" : ""}`}
-      onClick={onLike}
-    >
-      {isLiked ? "♥" : "♡"}
-    </button>
-  </div>
-</div>
+          <button
+            className={`like-button ${isLiked ? "liked" : ""}`}
+            onClick={onLike}
+          >
+            {isLiked ? "♥" : "♡"}
+          </button>
+        </div>
+      </div>
+
       {playlists.length > 0 && (
         <select
           className="playlist-select"
@@ -3843,7 +4720,16 @@ function TrackRow({
     <div className="track-row">
       <span className="track-number">{index + 1}</span>
 
-      <div className="track-row-cover">{track.emoji}</div>
+      <div className="track-row-cover">
+  {getTrackArtwork(track) ? (
+    <img
+      src={getTrackArtwork(track)}
+      alt={track.title}
+    />
+  ) : (
+    track.emoji
+  )}
+</div>
 
       <div className="track-row-info">
         <h3>{track.title}</h3>
@@ -3925,7 +4811,16 @@ function PlaylistPage({
             <div className="track-row" key={track.id}>
               <span className="track-number">{index + 1}</span>
 
-              <div className="track-row-cover">{track.emoji}</div>
+              <div className="track-row-cover">
+  {getTrackArtwork(track) ? (
+    <img
+      src={getTrackArtwork(track)}
+      alt={track.title}
+    />
+  ) : (
+    track.emoji
+  )}
+</div>
 
               <div className="track-row-info">
                 <h3>{track.title}</h3>
