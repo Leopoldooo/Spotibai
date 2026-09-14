@@ -117,6 +117,7 @@ margin-top: 32px;
   );
   border-radius: 16px;
   overflow: hidden;
+  min-width: 0;
 }
 
 .top-bar {
@@ -1908,8 +1909,8 @@ display: none;
 }
 
 .featured-artist-image {
-  width: 220px;
-  height: 220px;
+  width: 200px;
+  height: 200px;
   flex-shrink: 0;
   overflow: hidden;
   border-radius: 12px;
@@ -2009,7 +2010,7 @@ display: none;
 
 .home-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 280px;
   gap: 16px;
   align-items: start;
 }
@@ -2022,10 +2023,11 @@ display: none;
   position: sticky;
   top: 16px;
   height: calc(100vh - 137px);
-  padding: 24px;
+  padding: 20px;
   background: #121212;
   border-radius: 16px;
   overflow-y: auto;
+  min-width: 0;
 }
 
 .artist-panel-now-playing {
@@ -4095,4 +4097,40 @@ display: none;
 .search-icon {
   display: inline-block;
   transform: scaleX(-1);
+}
+
+@media (max-width: 1200px) {
+  .home-layout {
+    grid-template-columns: minmax(0, 1fr) 260px;
+  }
+
+  .featured-artist {
+    padding: 30px 24px 25px;
+  }
+
+  .featured-artist-content {
+    gap: 20px;
+    padding: 24px;
+  }
+
+  .featured-artist-image {
+    width: 170px;
+    height: 170px;
+  }
+
+  .artist-panel {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .home-layout {
+    display: block;
+  }
+
+  .artist-panel {
+    position: static;
+    height: auto;
+    margin: 16px 24px 0;
+  }
 }
