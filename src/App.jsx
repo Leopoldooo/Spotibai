@@ -8,6 +8,10 @@ const featuredArtist = {
   image: "🎵",
 };
 
+const recentlyAddedTrackIds = [18, 4, 28, 15];
+
+const popularTrackIds = [1, 6, 11, 22, 29, 3, 14, 19];
+
 
 const tracks = [
   {
@@ -18,11 +22,12 @@ const tracks = [
     duration: "0:42",
     emoji: "🎵",
     media: "/media/lucky-rap.mp4",
-    artwork: "/artwork/songs/lucky-rap.jpg",
-    albumId: 1,
-    artistId: 2,
+    artwork: "/artwork/songs/lucky1.png",
+    albumId: 6,
+    artistId: 0,
     lyrics: [],
   },
+
   {
     id: 2,
     title: "Hinarot",
@@ -31,11 +36,12 @@ const tracks = [
     duration: "0:28",
     emoji: "😂",
     media: "/media/hinarot-pusong-malambot.mp4",
-    artwork: "/artwork/songs/hinarot.jpg",
-    albumId: 1,
+    artwork: "/artwork/songs/baii.png",
+    albumId: 6,
     artistId: 2,
     lyrics: [],
   },
+
   {
     id: 3,
     title: "Chocolate",
@@ -44,11 +50,12 @@ const tracks = [
     duration: "0:35",
     emoji: "🎤",
     media: "/media/1975-jake-cuenca.mp4",
-    artwork: "/artwork/songs/chocolate.jpg",
-    albumId: 1,
-    artistId: 2,
+    artwork: "/artwork/songs/jake.jpg",
+    albumId: 6,
+    artistId: 0,
     lyrics: [],
   },
+
   {
     id: 4,
     title: "Wait A Minute",
@@ -57,11 +64,12 @@ const tracks = [
     duration: "0:51",
     emoji: "🔊",
     media: "/media/wait-a-minute.mp4",
-    artwork: "/artwork/songs/wait-a-minute.jpg",
+    artwork: "/artwork/songs/baii.png",
     albumId: 1,
     artistId: 2,
     lyrics: [],
   },
+
   {
     id: 5,
     title: "Beat It",
@@ -70,11 +78,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/bai beat it.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/baii.png",
     albumId: 1,
     artistId: 2,
     lyrics: [],
   },
+
   {
     id: 6,
     title: "Dyosa",
@@ -83,11 +92,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/bai dyosa.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/baii.png",
     albumId: 1,
     artistId: 2,
     lyrics: [],
   },
+
   {
     id: 7,
     title: "Michael",
@@ -96,11 +106,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/bai michael.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/baii.png",
     albumId: 1,
     artistId: 2,
     lyrics: [],
   },
+
   {
     id: 8,
     title: "Sisi",
@@ -109,11 +120,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/bai sisi.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/baii.png",
     albumId: 1,
     artistId: 2,
     lyrics: [],
   },
+
   {
     id: 9,
     title: "Mahirap Na",
@@ -127,6 +139,7 @@ const tracks = [
     artistId: null,
     lyrics: [],
   },
+
   {
     id: 10,
     title: "Byahe",
@@ -135,11 +148,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/garcia byahe.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/garcia-j.png",
     albumId: 2,
     artistId: 3,
     lyrics: [],
   },
+
   {
     id: 11,
     title: "Driftstar",
@@ -148,11 +162,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/garcia driftstar.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/garcia-j.png",
     albumId: 2,
     artistId: 3,
     lyrics: [],
   },
+
   {
     id: 12,
     title: "Dyosa",
@@ -161,11 +176,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/garcia dyosa.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/garcia-j.png",
     albumId: 2,
     artistId: 3,
     lyrics: [],
   },
+
   {
     id: 13,
     title: "Malambing",
@@ -174,11 +190,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/garcia malambing.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/garcia-j.png",
     albumId: 2,
     artistId: 3,
     lyrics: [],
   },
+
   {
     id: 14,
     title: "Sins",
@@ -187,24 +204,26 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/garcia sins.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/garcia-j.png",
     albumId: 2,
     artistId: 3,
     lyrics: [],
   },
+
   {
     id: 15,
-    title: "Hinarot",
+    title: "Goo Goo",
     creator: "Goo Goo Bai",
     description: "Goo Goo Bai",
     duration: "0:00",
     emoji: "😎",
-    media: "/media/googoo hinarot.mp3",
-    artwork: "",
+    media: "/media/googoo.mp3",
+    artwork: "/artwork/songs/googoobai.png",
     albumId: 6,
     artistId: 5,
     lyrics: [],
   },
+
   {
     id: 16,
     title: "Hari ng Drill",
@@ -213,11 +232,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎧",
     media: "/media/jnick hari ng drill.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/jnick.jpg",
     albumId: 6,
     artistId: 6,
     lyrics: [],
   },
+
   {
     id: 17,
     title: "Mala",
@@ -226,11 +246,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎧",
     media: "/media/jnick mala.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/jnick.jpg",
     albumId: 6,
     artistId: 6,
     lyrics: [],
   },
+
   {
     id: 18,
     title: "Fall",
@@ -239,11 +260,12 @@ const tracks = [
     duration: "0:00",
     emoji: "⭐",
     media: "/media/jupeta fall.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/mami jupeta.jpg",
     albumId: 5,
     artistId: 8,
     lyrics: [],
   },
+
   {
     id: 19,
     title: "Fearless",
@@ -252,11 +274,12 @@ const tracks = [
     duration: "0:00",
     emoji: "⭐",
     media: "/media/jupeta fearless.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/mami jupeta.jpg",
     albumId: 5,
     artistId: 8,
     lyrics: [],
   },
+
   {
     id: 20,
     title: "Tanga",
@@ -265,11 +288,12 @@ const tracks = [
     duration: "0:00",
     emoji: "⭐",
     media: "/media/jupeta tanga.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/mami jupeta.jpg",
     albumId: 5,
     artistId: 8,
     lyrics: [],
   },
+
   {
     id: 21,
     title: "Understand",
@@ -278,11 +302,12 @@ const tracks = [
     duration: "0:00",
     emoji: "⭐",
     media: "/media/jupeta understand.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/mami jupeta.jpg",
     albumId: 5,
     artistId: 8,
     lyrics: [],
   },
+
   {
     id: 22,
     title: "Otin",
@@ -291,11 +316,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/rene jay otin.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/reneja.jpg",
     albumId: 3,
     artistId: 1,
     lyrics: [],
   },
+
   {
     id: 23,
     title: "Bruises",
@@ -304,11 +330,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/renejay bruises.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/reneja.jpg",
     albumId: 3,
     artistId: 1,
     lyrics: [],
   },
+
   {
     id: 24,
     title: "Chosen",
@@ -317,11 +344,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/renejay chosen.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/reneja.jpg",
     albumId: 3,
     artistId: 1,
     lyrics: [],
   },
+
   {
     id: 25,
     title: "Ipagpatawad",
@@ -330,11 +358,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/renejay ipagpatawad.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/reneja.jpg",
     albumId: 3,
     artistId: 1,
     lyrics: [],
   },
+
   {
     id: 26,
     title: "Peaches",
@@ -343,11 +372,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/renejay peaches.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/reneja.jpg",
     albumId: 3,
     artistId: 1,
     lyrics: [],
   },
+
   {
     id: 27,
     title: "Rain",
@@ -356,11 +386,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🎵",
     media: "/media/renejay rain.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/reneja.jpg",
     albumId: 3,
     artistId: 1,
     lyrics: [],
   },
+
   {
     id: 28,
     title: "Ikaw",
@@ -369,11 +400,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🔥",
     media: "/media/uzi ikaw.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/robobai.png",
     albumId: 6,
     artistId: 4,
     lyrics: [],
   },
+
   {
     id: 29,
     title: "Heartbreak",
@@ -382,11 +414,12 @@ const tracks = [
     duration: "0:00",
     emoji: "🌎",
     media: "/media/vic heartbreak.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/vic.jpg",
     albumId: 4,
     artistId: 9,
     lyrics: [],
   },
+
   {
     id: 30,
     title: "Reason",
@@ -395,7 +428,7 @@ const tracks = [
     duration: "0:00",
     emoji: "🌎",
     media: "/media/vic reason.mp3",
-    artwork: "",
+    artwork: "/artwork/songs/vic.jpg",
     albumId: 4,
     artistId: 9,
     lyrics: [],
@@ -589,13 +622,14 @@ useEffect(() => {
 
   const currentEntry = navigationHistory[navigationIndex];
 
-  if (
-    currentEntry &&
-    currentEntry.page === page &&
-    currentEntry.playlistId === playlistId
-  ) {
-    return;
-  }
+ if (
+  currentEntry &&
+  currentEntry.page === page &&
+  currentEntry.playlistId === playlistId &&
+  currentPage === page
+) {
+  return;
+}
 
   const newHistory = navigationHistory.slice(
     0,
@@ -1717,19 +1751,11 @@ const filteredTracks = tracks.filter((track) => {
 });
 
 
-const savedTrackAssignments = JSON.parse(
-  localStorage.getItem("spotibai-track-assignments") || "{}"
-);
-
-const assignedTracks = tracks.map((track) => {
-  const assignment = savedTrackAssignments[track.id] || {};
-
-  return {
-    ...track,
-    assignedAlbumId: assignment.albumId || null,
-    assignedArtistId: assignment.artistId || null,
-  };
-});
+const assignedTracks = tracks.map((track) => ({
+  ...track,
+  assignedAlbumId: track.albumId || null,
+  assignedArtistId: track.artistId || null,
+}));
 
 const filteredArtists = artists.filter((artist) => {
   if (!normalizedSearch) {
@@ -1856,10 +1882,7 @@ const searchResults =
             Search
           </button>
 
-          <button className="nav-item">
-            <span>▣</span>
-            Your Library
-          </button>
+         
         </nav>
 
         <div className="sidebar-section">
@@ -2089,7 +2112,10 @@ const searchResults =
       </div>
 
       <div className="music-grid">
-        {tracks.slice(-4).reverse().map((track) => (
+        {recentlyAddedTrackIds
+  .map((id) => tracks.find((track) => track.id === id))
+  .filter(Boolean)
+  .map((track) => (
           <TrackCard
             key={track.id}
             track={track}
@@ -2113,7 +2139,10 @@ const searchResults =
       </div>
 
       <div className="track-list home-track-list">
-        {tracks.slice(0, 8).map((track, index) => (
+        {popularTrackIds
+  .map((id) => tracks.find((track) => track.id === id))
+  .filter(Boolean)
+  .map((track, index) => (
           <TrackRow
             key={track.id}
             track={track}
@@ -2699,15 +2728,18 @@ const searchResults =
 
 {currentPage === "album" && selectedAlbum && (
   <section className="page-section album-page">
-    <button
-      className="back-button"
-      onClick={() => {
-  setSelectedArtist(null);
-  navigateToPage("search");
-}}
-    >
-      ← Back to search
-    </button>
+<button
+  className="back-button"
+  onClick={() => {
+    navigateToPage("search");
+    setSelectedAlbum(null);
+    setSelectedArtist(null);
+  }}
+>
+  ← Back to search
+</button>
+
+
 
     <div className="album-profile-header">
       <div className="album-profile-image">
