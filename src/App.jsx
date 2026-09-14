@@ -1878,7 +1878,7 @@ const searchResults =
     setSelectedPlaylist(null);
   }}
 >
-            <span className="search-icon"></span>
+            <span>⌕</span>
 Search
           </button>
 
@@ -2261,7 +2261,7 @@ Search
     </div>
 
     <div className="search-container">
-      <span className="search-icon">🔍</span>
+      <span className="search-icon"></span>
 
       <input
         type="text"

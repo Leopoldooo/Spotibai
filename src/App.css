@@ -4071,9 +4071,9 @@ display: none;
 }
 
 .search-icon {
-  width: 16px;
-  height: 16px;
-  border: 2px solid currentColor;
+  width: 14px;
+  height: 14px;
+  border: 1.8px solid currentColor;
   border-radius: 50%;
   position: relative;
   display: inline-block;
@@ -4090,4 +4090,9 @@ display: none;
   bottom: -2px;
   transform: rotate(45deg);
   border-radius: 2px;
+}
+
+.search-icon {
+  display: inline-block;
+  transform: scaleX(-1);
 }
