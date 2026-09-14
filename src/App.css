@@ -334,14 +334,23 @@ font-size: 13px;
 }
 
 .mini-cover {
-display: grid;
-width: 62px;
-height: 62px;
-flex-shrink: 0;
-place-items: center;
-border-radius: 4px;
-background: #555;
-font-size: 26px;
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.mini-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .now-playing h4,
@@ -1899,15 +1908,18 @@ display: none;
 }
 
 .featured-artist-image {
-  display: grid;
-  width: 170px;
-  height: 170px;
+  width: 220px;
+  height: 220px;
   flex-shrink: 0;
-  place-items: center;
-  border-radius: 50%;
-  background: #555;
-  font-size: 65px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.featured-artist-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .featured-artist-info h1 {
@@ -2140,14 +2152,23 @@ display: none;
 }
 
 .next-queue-image {
-  display: grid;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
-  place-items: center;
-  border-radius: 6px;
-  background: #292929;
-  font-size: 24px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.next-queue-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .next-queue-info {
@@ -3185,19 +3206,23 @@ display: none;
 }
 
 .queue-track-cover {
-  width: 42px;
-  height: 42px;
-
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
-
+  overflow: hidden;
+  border-radius: 4px;
+  background: #333;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: #282828;
-  border-radius: 5px;
-
   font-size: 22px;
+}
+
+.queue-track-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .queue-track-info {

@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 
 const featuredArtist = {
-  name: "Spotibai",
+  name: "Bai",
   description:
     "The home of funny, memorable, and unexpected music from the Spotibai community.",
-  image: "🎵",
+  image: "/artwork/artists/baii.png",
 };
 
 const recentlyAddedTrackIds = [18, 4, 28, 15];
@@ -2085,8 +2085,11 @@ const searchResults =
 
         <div className="featured-artist-content">
           <div className="featured-artist-image">
-            {featuredArtist.image}
-          </div>
+  <img
+    src={featuredArtist.image}
+    alt={featuredArtist.name}
+  />
+</div>
 
           <div className="featured-artist-info">
             <p className="featured-label">Artist</p>
@@ -2210,8 +2213,15 @@ const searchResults =
           onClick={() => playTrack(nextTrack, playQueue)}
         >
           <span className="next-queue-image">
-            {nextTrack.emoji}
-          </span>
+  {nextTrack.artwork ? (
+    <img
+      src={nextTrack.artwork}
+      alt={nextTrack.title}
+    />
+  ) : (
+    nextTrack.emoji
+  )}
+</span>
 
           <span className="next-queue-info">
             <strong>{nextTrack.title}</strong>
@@ -4323,9 +4333,16 @@ setEditorActiveLyricIndex(-1);
       </p>
 
       <div className="queue-track current">
-        <div className="queue-track-cover">
-          {currentTrack.emoji}
-        </div>
+      <div className="queue-track-cover">
+  {currentTrack.artwork ? (
+    <img
+      src={currentTrack.artwork}
+      alt={currentTrack.title}
+    />
+  ) : (
+    currentTrack.emoji
+  )}
+</div>
 
         <div className="queue-track-info">
           <strong>{currentTrack.title}</strong>
@@ -4459,9 +4476,15 @@ setEditorActiveLyricIndex(-1);
                     playTrack(track, playQueue)
                   }
                 >
-                  <div className="queue-track-cover">
-                    {track.emoji}
-                  </div>
+ <div className="queue-track-cover"> 
+    {track.artwork ? ( 
+      <img src={track.artwork} 
+      alt={track.title} 
+      /> 
+  ) : ( 
+    track.emoji 
+    )} 
+  </div>
 
                   <div className="queue-track-info">
                     <strong>{track.title}</strong>
@@ -4487,7 +4510,16 @@ setEditorActiveLyricIndex(-1);
 
       <div className="player">
         <div className="now-playing">
-          <div className="mini-cover">{currentTrack.emoji}</div>
+          <div className="mini-cover">
+  {getTrackArtwork(currentTrack) ? (
+    <img
+      src={getTrackArtwork(currentTrack)}
+      alt={currentTrack.title}
+    />
+  ) : (
+    currentTrack.emoji
+  )}
+</div>
 
           <div>
             <h4>{currentTrack.title}</h4>
