@@ -1878,8 +1878,8 @@ const searchResults =
     setSelectedPlaylist(null);
   }}
 >
-            <span>🔍</span>
-            Search
+            <span className="search-icon"></span>
+Search
           </button>
 
          
@@ -2012,9 +2012,16 @@ const searchResults =
         Now Playing
       </div>
 
-      <div className="artist-panel-image">
-        {currentTrack.emoji}
-      </div>
+      <div className="artist-panel-image"> 
+        {getTrackArtwork(currentTrack) ? ( 
+          <img 
+          src={getTrackArtwork(currentTrack)} 
+          alt={currentTrack.title} 
+          /> 
+          ) : ( 
+            currentTrack.emoji 
+            )} 
+            </div>
 
       <div className="artist-panel-song">
         <h2>{currentTrack.title}</h2>
@@ -2168,9 +2175,16 @@ const searchResults =
     Now Playing
   </div>
 
-  <div className="artist-panel-image">
-    {currentTrack.emoji}
-  </div>
+ <div className="artist-panel-image">
+  {getTrackArtwork(currentTrack) ? (
+    <img
+      src={getTrackArtwork(currentTrack)}
+      alt={currentTrack.title}
+    />
+  ) : (
+    currentTrack.emoji
+  )}
+</div>
 
   <div className="artist-panel-song">
     <h2>{currentTrack.title}</h2>
