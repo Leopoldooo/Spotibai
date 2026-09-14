@@ -139,6 +139,8 @@ const [navigationHistory, setNavigationHistory] = useState([
   const [playQueue, setPlayQueue] = useState(tracks);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [isShuffleOn, setIsShuffleOn] = useState(false);
+  const [isLoopOn, setIsLoopOn] = useState(false);
   const [volume, setVolume] = useState(1);
 
   /* sa lyrics editor */
@@ -169,6 +171,10 @@ const [navigationHistory, setNavigationHistory] = useState([
 
   setShowAdminLogin(true);
 }, []);
+
+useEffect(() => {
+  setShowLyrics(false);
+}, [currentPage]);
 
   const navigateToPage = (page, playlistId = null) => {
   if (isNavigatingHistory) {
@@ -1350,6 +1356,7 @@ const searchResults =
           </button>
         </div>
       </aside>
+      
 
       <main className="main-content">
         <header className="top-bar">
@@ -1392,33 +1399,152 @@ const searchResults =
 </button>
         </header>
 
-       {currentPage === "home" && (
+{showLyrics ? (
   <div className="home-layout">
+
     <main className="home-main">
-    <section className="featured-artist">
-      <p className="eyebrow">FEATURED ARTIST</p>
 
-      <div className="featured-artist-content">
-        <div className="featured-artist-image">
-          {featuredArtist.image}
+      <section className="lyrics-main-view">
+        <button
+          className="lyrics-close"
+          onClick={() => setShowLyrics(false)}
+          aria-label="Close lyrics"
+        >
+          ×
+        </button>
+
+        <div
+          className="lyrics-content"
+          ref={lyricsContentRef}
+        >
+          {savedLyrics[currentTrack.id]?.length > 0 ? (
+            savedLyrics[currentTrack.id].map((line, index) => (
+              <p
+                key={`${line.time}-${index}`}
+                className={
+                  index === activeLyricIndex
+                    ? "active-lyric"
+                    : index < activeLyricIndex
+                    ? "past-lyric"
+                    : ""
+                }
+                onClick={() => {
+                  if (!audioRef.current) {
+                    return;
+                  }
+
+                  audioRef.current.currentTime = line.time;
+                  setCurrentTime(line.time);
+                }}
+              >
+                {line.text}
+              </p>
+            ))
+          ) : (
+            <p>No synced lyrics available.</p>
+          )}
         </div>
+      </section>
 
-        <div className="featured-artist-info">
-          <p className="featured-label">Artist</p>
+    </main>
 
-          <h1>{featuredArtist.name}</h1>
-
-          <p>{featuredArtist.description}</p>
-
-          <button
-            className="primary-button"
-            onClick={() => playTrack(tracks[0])}
-          >
-            ▶ Play
-          </button>
-        </div>
+    <aside className="artist-panel">
+      <div className="artist-panel-header">
+        Now Playing
       </div>
-    </section>
+
+      <div className="artist-panel-image">
+        {currentTrack.emoji}
+      </div>
+
+      <div className="artist-panel-song">
+        <h2>{currentTrack.title}</h2>
+        <p>{currentTrack.creator}</p>
+      </div>
+
+      <div className="artist-info-box">
+        <h3>About the artist</h3>
+
+        <p>
+          {currentTrack.creator} is featured on Spotibai with
+          funny, memorable, and unexpected music.
+        </p>
+      </div>
+
+      <div className="queue-box">
+        <h3>Next on queue</h3>
+
+        {(() => {
+          const currentIndex = playQueue.findIndex(
+            (track) => track.id === currentTrack.id
+          );
+
+          const nextTrack =
+            currentIndex >= 0
+              ? playQueue[(currentIndex + 1) % playQueue.length]
+              : playQueue[0];
+
+          if (!nextTrack || nextTrack.id === currentTrack.id) {
+            return (
+              <p className="queue-empty">
+                No other songs in queue
+              </p>
+            );
+          }
+
+          return (
+            <button
+              className="next-queue-item"
+              onClick={() => playTrack(nextTrack, playQueue)}
+            >
+              <span className="next-queue-image">
+                {nextTrack.emoji}
+              </span>
+
+              <span className="next-queue-info">
+                <strong>{nextTrack.title}</strong>
+                <small>{nextTrack.creator}</small>
+              </span>
+            </button>
+          );
+        })()}
+      </div>
+    </aside>
+
+  </div>
+) : (
+  <>
+
+
+{currentPage === "home" && (
+  <div className="home-layout">
+
+    <main className="home-main">
+
+      <section className="featured-artist">
+        <p className="eyebrow">FEATURED ARTIST</p>
+
+        <div className="featured-artist-content">
+          <div className="featured-artist-image">
+            {featuredArtist.image}
+          </div>
+
+          <div className="featured-artist-info">
+            <p className="featured-label">Artist</p>
+
+            <h1>{featuredArtist.name}</h1>
+
+            <p>{featuredArtist.description}</p>
+
+            <button
+              className="primary-button"
+              onClick={() => playTrack(tracks[0])}
+            >
+              ▶ Play
+            </button>
+          </div>
+        </div>
+      </section>
 
     <section className="music-section recently-added-section">
       <div className="section-header">
@@ -1437,6 +1563,8 @@ const searchResults =
             playlists={playlists}
             onAddToPlaylist={addTrackToPlaylist}
             onAddToQueue={addToQueue}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
           />
         ))}
       </div>
@@ -1458,13 +1586,16 @@ const searchResults =
             onLike={() => toggleLike(track.id)}
             onPlay={() => playTrack(track)}
             onAddToQueue={addToQueue}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
           />
         ))}
       </div>
     </section>
      </main>
+  
 
-      <aside className="artist-panel">
+  <aside className="artist-panel">
   <div className="artist-panel-header">
     Now Playing
   </div>
@@ -1619,6 +1750,8 @@ const searchResults =
                   onLike={() => toggleLike(track.id)}
                   onPlay={() => playTrack(track)}
                   onAddToQueue={addToQueue}
+                  currentTrack={currentTrack}
+                  isPlaying={isPlaying}
                 />
               ))}
             </div>
@@ -1745,6 +1878,8 @@ const searchResults =
                       onLike={() => toggleLike(track.id)}
                       onPlay={() => playTrack(track)}
                       onAddToQueue={addToQueue}
+                      currentTrack={currentTrack}
+                      isPlaying={isPlaying}
                     />
                   ))}
                 </div>
@@ -1818,6 +1953,8 @@ const searchResults =
                     onLike={() => toggleLike(track.id)}
                     onPlay={() => playTrack(track)}
                     onAddToQueue={addToQueue}
+                    currentTrack={currentTrack}
+                    isPlaying={isPlaying}
                   />
                 ))}
               </div>
@@ -1968,6 +2105,8 @@ const searchResults =
               onLike={() => toggleLike(track.id)}
               onPlay={() => playTrack(track)}
               onAddToQueue={addToQueue}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
             />
           ))}
       </div>
@@ -2026,6 +2165,8 @@ const searchResults =
               key={track.id}
               track={track}
               index={index}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
               isLiked={likedTracks.includes(track.id)}
               onLike={() => toggleLike(track.id)}
               onAddToQueue={addToQueue}
@@ -2122,6 +2263,8 @@ const searchResults =
           <PlaylistPage
             playlist={selectedPlaylist}
             tracks={tracks}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
             onBack={() => {
   setSelectedPlaylist(null);
   navigateToPage("playlist");
@@ -2171,6 +2314,8 @@ onAddToQueue={addToQueue}
                   <TrackRow
                     key={track.id}
                     track={track}
+                    currentTrack={currentTrack}
+                    isPlaying={isPlaying}
                     index={index}
                     isLiked={true}
                     onLike={() => toggleLike(track.id)}
@@ -2181,9 +2326,10 @@ onAddToQueue={addToQueue}
             )}
           </section>
         )}
-      </main>
+       </>
+)}
 
-      {/* LYRICS EDITOR */}
+      
 
       {showAdminLogin && (
   <div className="admin-login-overlay">
@@ -2620,20 +2766,53 @@ setEditorActiveLyricIndex(-1);
           }
         }}
         onEnded={() => {
+  if (isLoopOn) {
+    if (!audioRef.current) {
+      return;
+    }
+
+    audioRef.current.currentTime = 0;
+    setCurrentTime(0);
+    setIsPlaying(true);
+
+    audioRef.current.play().catch(() => {
+      setIsPlaying(false);
+    });
+
+    return;
+  }
+
   const currentIndex = playQueue.findIndex(
     (track) => track.id === currentTrack.id
   );
 
-  if (
-    currentIndex === -1 ||
-    currentIndex >= playQueue.length - 1
-  ) {
+  if (currentIndex === -1 || playQueue.length === 0) {
     setIsPlaying(false);
     setCurrentTime(0);
     return;
   }
 
-  const nextTrack = playQueue[currentIndex + 1];
+  let nextTrack;
+
+  if (isShuffleOn && playQueue.length > 1) {
+    const availableTracks = playQueue.filter(
+      (track) => track.id !== currentTrack.id
+    );
+
+    const randomIndex = Math.floor(
+      Math.random() * availableTracks.length
+    );
+
+    nextTrack = availableTracks[randomIndex];
+  } else {
+    if (currentIndex >= playQueue.length - 1) {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      return;
+    }
+
+    nextTrack = playQueue[currentIndex + 1];
+  }
 
   setCurrentTrack(nextTrack);
   setCurrentTime(0);
@@ -2645,63 +2824,11 @@ setEditorActiveLyricIndex(-1);
     setIsPlaying(false);
   }
 }}
+
         style={{ display: "none" }}
       />
 
-{showLyrics && (
-  <div className="lyrics-panel">
-    <div className="lyrics-window">
 
-      <div className="lyrics-header">
-        <div>
-          <p className="eyebrow">LYRICS</p>
-          <h2>{currentTrack.title}</h2>
-        </div>
-
-        <button
-          className="lyrics-close"
-          onClick={() => setShowLyrics(false)}
-          aria-label="Close lyrics"
-        >
-          ×
-        </button>
-      </div>
-
-      <div
-        className="lyrics-content"
-        ref={lyricsContentRef}
-      >
-        {savedLyrics[currentTrack.id]?.length > 0 ? (
-          savedLyrics[currentTrack.id].map((line, index) => (
-            <p
-              key={`${line.time}-${index}`}
-              className={
-                index === activeLyricIndex
-                  ? "active-lyric"
-                  : index < activeLyricIndex
-                  ? "past-lyric"
-                  : ""
-              }
-              onClick={() => {
-                if (!audioRef.current) {
-                  return;
-                }
-
-                audioRef.current.currentTime = line.time;
-                setCurrentTime(line.time);
-              }}
-            >
-              {line.text}
-            </p>
-          ))
-        ) : (
-          <p>No synced lyrics available.</p>
-        )}
-      </div>
-
-    </div>
-  </div>
-)}
 
 {showProfile && (
   <div className="profile-panel">
@@ -3488,6 +3615,16 @@ setEditorActiveLyricIndex(-1);
 
         <div className="player-controls">
           <div className="control-buttons">
+
+<button
+  className={`shuffle-button ${isShuffleOn ? "active" : ""}`}
+  onClick={() => setIsShuffleOn((current) => !current)}
+  aria-label="Shuffle"
+>
+  ⇆
+</button>
+
+
             <button
   onClick={() => {
     const currentIndex = playQueue.findIndex(
@@ -3530,6 +3667,15 @@ setEditorActiveLyricIndex(-1);
 >
   ⏭
 </button>
+
+<button
+  className={`loop-button ${isLoopOn ? "active" : ""}`}
+  onClick={() => setIsLoopOn((current) => !current)}
+  aria-label="Loop"
+>
+  ⟳
+</button>
+
           </div>
 
           <div className="progress-container">
@@ -3572,14 +3718,23 @@ setEditorActiveLyricIndex(-1);
     setShowComments(false);
   }}
 >
-  ☷ Queue
+  <span className="queue-icon">
+  <span></span>
+  <span></span>
+  <span></span>
+</span>
 </button>
 
   <button
     className="lyrics-button"
     onClick={() => setShowLyrics(!showLyrics)}
   >
-    Lyrics
+    <span className="mic-icon">
+  <span className="mic-icon-body"></span>
+  <span className="mic-icon-curve"></span>
+  <span className="mic-icon-stem"></span>
+  <span className="mic-icon-base"></span>
+</span>
   </button>
 
   <span>🔊</span>
@@ -3598,6 +3753,7 @@ setEditorActiveLyricIndex(-1);
 />
 </div>
       </div>
+      </main>
     </div>
   );
 }
@@ -3680,6 +3836,8 @@ function TrackRow({
   onLike,
   onPlay,
   onAddToQueue,
+  currentTrack,
+  isPlaying,
 }) {
   return (
     <div className="track-row">
@@ -3699,9 +3857,12 @@ function TrackRow({
         ♥
       </button>
 
-      <button className="track-play-button" onClick={onPlay}>
-        ▶
-      </button>
+      <button
+  className="track-play-button"
+  onClick={() => onPlay(track)}
+>
+  {currentTrack.id === track.id && isPlaying ? "❚❚" : "▶"}
+</button>
 
       <span className="track-duration">{track.duration}</span>
     </div>
@@ -3715,6 +3876,9 @@ function PlaylistPage({
   onPlay,
   onRemove,
   onAddToQueue,
+  currentTrack,
+  isPlaying,
+
 
 }) {
   const playlistTracks = tracks.filter((track) =>
@@ -3753,7 +3917,10 @@ function PlaylistPage({
           </p>
         </div>
       ) : (
-        <div className="track-list">
+
+        /* playlist page */
+        
+        <div className="track-list playlist-track-list">
           {playlistTracks.map((track, index) => (
             <div className="track-row" key={track.id}>
               <span className="track-number">{index + 1}</span>
@@ -3774,9 +3941,9 @@ function PlaylistPage({
 
 <button
   className="track-play-button"
-  onClick={onPlay}
+  onClick={() => onPlay(track)}
 >
-  ▶
+  {currentTrack.id === track.id && isPlaying ? "❚❚" : "▶"}
 </button>
               <button
                 className="remove-track"
@@ -3784,7 +3951,7 @@ function PlaylistPage({
                   onRemove(playlist.id, track.id)
                 }
               >
-                Remove
+                  ×
               </button>
 
               <span className="track-duration">
